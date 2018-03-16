@@ -7,7 +7,7 @@
 ;Variables
 
   !define PRODUCT_NAME "Denariium"
-  !define PRODUCT_WEB_SITE "https://github.com/spesmilo/denariium"
+  !define PRODUCT_WEB_SITE "https://github.com/carsenk/denariium"
   !define PRODUCT_PUBLISHER "Denariium Technologies GmbH"
   !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 
@@ -58,7 +58,7 @@
   VIAddVersionKey ProductName "${PRODUCT_NAME} Installer"
   VIAddVersionKey Comments "The installer for ${PRODUCT_NAME}"
   VIAddVersionKey CompanyName "${PRODUCT_NAME}"
-  VIAddVersionKey LegalCopyright "2013-2016 ${PRODUCT_PUBLISHER}"
+  VIAddVersionKey LegalCopyright "2017-2018 ${PRODUCT_PUBLISHER}"
   VIAddVersionKey FileDescription "${PRODUCT_NAME} Installer"
   VIAddVersionKey FileVersion ${PRODUCT_VERSION}
   VIAddVersionKey ProductVersion ${PRODUCT_VERSION}

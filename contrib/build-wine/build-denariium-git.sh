@@ -26,7 +26,7 @@ for repo in denariium denariium-locale denariium-icons; do
 	git checkout master
 	cd ..
     else
-	URL=https://github.com/spesmilo/$repo.git
+	URL=https://github.com/carsenk/$repo.git
 	git clone -b master $URL $repo
     fi
 done
