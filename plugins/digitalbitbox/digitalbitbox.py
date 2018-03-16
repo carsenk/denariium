@@ -1,19 +1,19 @@
 # ----------------------------------------------------------------------------------
-# Electrum plugin for the Digital Bitbox hardware wallet by Shift Devices AG
+# Denariium plugin for the Digital Bitbox hardware wallet by Shift Devices AG
 # digitalbitbox.com
 #
 
 try:
-    import electrum
-    from electrum.bitcoin import TYPE_ADDRESS, push_script, var_int, msg_magic, Hash, verify_message, pubkey_from_signature, point_to_ser, public_key_to_p2pkh, EncodeAES, DecodeAES, MyVerifyingKey
-    from electrum.bitcoin import serialize_xpub, deserialize_xpub
-    from electrum import constants
-    from electrum.transaction import Transaction
-    from electrum.i18n import _
-    from electrum.keystore import Hardware_KeyStore
+    import denariium
+    from denariium.denarius import TYPE_ADDRESS, push_script, var_int, msg_magic, Hash, verify_message, pubkey_from_signature, point_to_ser, public_key_to_p2pkh, EncodeAES, DecodeAES, MyVerifyingKey
+    from denariium.denarius import serialize_xpub, deserialize_xpub
+    from denariium import constants
+    from denariium.transaction import Transaction
+    from denariium.i18n import _
+    from denariium.keystore import Hardware_KeyStore
     from ..hw_wallet import HW_PluginBase
-    from electrum.util import print_error, to_string, UserCancelled
-    from electrum.base_wizard import ScriptTypeNotSupported, HWD_SETUP_NEW_WALLET
+    from denariium.util import print_error, to_string, UserCancelled
+    from denariium.base_wizard import ScriptTypeNotSupported, HWD_SETUP_NEW_WALLET
 
     import time
     import hid
@@ -96,7 +96,7 @@ class DigitalBitbox_Client():
             # only ever returns the mainnet standard type, but it is agnostic
             # to the type when signing.
             if xtype != 'standard' or constants.net.TESTNET:
-                _, depth, fingerprint, child_number, c, cK = deserialize_xpub(xpub, net=constants.BitcoinMainnet)
+                _, depth, fingerprint, child_number, c, cK = deserialize_xpub(xpub, net=constants.DenariusMainnet)
                 xpub = serialize_xpub(xtype, c, cK, depth, fingerprint, child_number)
             return xpub
         else:
@@ -184,7 +184,7 @@ class DigitalBitbox_Client():
 
         # Initialize device if not yet initialized
         if not self.setupRunning:
-            self.isInitialized = True # Wallet exists. Electrum code later checks if the device matches the wallet
+            self.isInitialized = True # Wallet exists. Denariium code later checks if the device matches the wallet
         elif not self.isInitialized:
             reply = self.hid_send_encrypt(b'{"device":"info"}')
             if reply['device']['id'] != "":
@@ -277,8 +277,8 @@ class DigitalBitbox_Client():
 
     def dbb_generate_wallet(self):
         key = self.stretch_key(self.password)
-        filename = ("Electrum-" + time.strftime("%Y-%m-%d-%H-%M-%S") + ".pdf").encode('utf8')
-        msg = b'{"seed":{"source": "create", "key": "%s", "filename": "%s", "entropy": "%s"}}' % (key, filename, b'Digital Bitbox Electrum Plugin')
+        filename = ("Denariium-" + time.strftime("%Y-%m-%d-%H-%M-%S") + ".pdf").encode('utf8')
+        msg = b'{"seed":{"source": "create", "key": "%s", "filename": "%s", "entropy": "%s"}}' % (key, filename, b'Digital Bitbox Denariium Plugin')
         reply = self.hid_send_encrypt(msg)
         if 'error' in reply:
             raise Exception(reply['error']['message'])

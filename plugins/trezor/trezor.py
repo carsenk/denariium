@@ -2,14 +2,14 @@ import threading
 
 from binascii import hexlify, unhexlify
 
-from electrum.util import bfh, bh2u, versiontuple
-from electrum.bitcoin import (b58_address_to_hash160, xpub_from_pubkey,
+from denariium.util import bfh, bh2u, versiontuple
+from denariium.denarius import (b58_address_to_hash160, xpub_from_pubkey,
                               TYPE_ADDRESS, TYPE_SCRIPT)
-from electrum import constants
-from electrum.i18n import _
-from electrum.plugins import BasePlugin, Device
-from electrum.transaction import deserialize
-from electrum.keystore import Hardware_KeyStore, is_xpubkey, parse_xpubkey
+from denariium import constants
+from denariium.i18n import _
+from denariium.plugins import BasePlugin, Device
+from denariium.transaction import deserialize
+from denariium.keystore import Hardware_KeyStore, is_xpubkey, parse_xpubkey
 
 from ..hw_wallet import HW_PluginBase
 
@@ -245,7 +245,7 @@ class TrezorPlugin(HW_PluginBase):
         return client
 
     def get_coin_name(self):
-        return "Testnet" if constants.net.TESTNET else "Bitcoin"
+        return "Testnet" if constants.net.TESTNET else "Denarius"
 
     def initialize_device(self, device_id, wizard, handler):
         # Initialization method
@@ -504,7 +504,7 @@ class TrezorPlugin(HW_PluginBase):
 
         return outputs
 
-    def electrum_tx_to_txtype(self, tx):
+    def denariium_tx_to_txtype(self, tx):
         t = self.types.TransactionType()
         if tx is None:
             # probably for segwit input and we don't need this prev txn
@@ -523,4 +523,4 @@ class TrezorPlugin(HW_PluginBase):
     # This function is called from the trezor libraries (via tx_api)
     def get_tx(self, tx_hash):
         tx = self.prev_tx[tx_hash]
-        return self.electrum_tx_to_txtype(tx)
+        return self.denariium_tx_to_txtype(tx)

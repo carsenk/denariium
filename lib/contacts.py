@@ -1,4 +1,4 @@
-# Electrum - Lightweight Bitcoin Client
+# Denariium - Lightweight Denarius Client
 # Copyright (c) 2015 Thomas Voegtlin
 #
 # Permission is hereby granted, free of charge, to any person
@@ -27,7 +27,7 @@ import json
 import traceback
 import sys
 
-from . import bitcoin
+from . import denarius
 from . import dnssec
 from .util import export_meta, import_meta, print_error, to_string
 
@@ -44,7 +44,7 @@ class Contacts(dict):
         # backward compatibility
         for k, v in self.items():
             _type, n = v
-            if _type == 'address' and bitcoin.is_address(n):
+            if _type == 'address' and denarius.is_address(n):
                 self.pop(k)
                 self[n] = ('address', k)
 
@@ -71,7 +71,7 @@ class Contacts(dict):
             self.save()
 
     def resolve(self, k):
-        if bitcoin.is_address(k):
+        if denarius.is_address(k):
             return {
                 'address': k,
                 'type': 'address'
@@ -92,7 +92,7 @@ class Contacts(dict):
                 'type': 'openalias',
                 'validated': validated
             }
-        raise Exception("Invalid Bitcoin address or alias", k)
+        raise Exception("Invalid Denarius address or alias", k)
 
     def resolve_openalias(self, url):
         # support email-style addresses, per the OA standard
@@ -125,7 +125,7 @@ class Contacts(dict):
         for k, v in list(data.items()):
             if k == 'contacts':
                 return self._validate(v)
-            if not bitcoin.is_address(k):
+            if not denarius.is_address(k):
                 data.pop(k)
             else:
                 _type, _ = v

@@ -7,28 +7,28 @@ import traceback
 
 import base64
 
-import electrum
-from electrum.plugins import BasePlugin, hook
-from electrum.i18n import _
+import denariium
+from denariium.plugins import BasePlugin, hook
+from denariium.i18n import _
 
 
 class LabelsPlugin(BasePlugin):
 
     def __init__(self, parent, config, name):
         BasePlugin.__init__(self, parent, config, name)
-        self.target_host = 'labels.electrum.org'
+        self.target_host = 'labels.denariium.org'
         self.wallets = {}
 
     def encode(self, wallet, msg):
         password, iv, wallet_id = self.wallets[wallet]
-        encrypted = electrum.bitcoin.aes_encrypt_with_iv(password, iv,
+        encrypted = denariium.denarius.aes_encrypt_with_iv(password, iv,
                                                          msg.encode('utf8'))
         return base64.b64encode(encrypted).decode()
 
     def decode(self, wallet, message):
         password, iv, wallet_id = self.wallets[wallet]
         decoded = base64.b64decode(message)
-        decrypted = electrum.bitcoin.aes_decrypt_with_iv(password, iv, decoded)
+        decrypted = denariium.denarius.aes_decrypt_with_iv(password, iv, decoded)
         return decrypted.decode('utf8')
 
     def get_nonce(self, wallet):

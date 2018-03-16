@@ -93,8 +93,8 @@ Builder.load_string('''
 ''')
 
 
-from electrum_gui.kivy.i18n import _
-from electrum_gui.kivy.uix.context_menu import ContextMenu
+from denariium_gui.kivy.i18n import _
+from denariium_gui.kivy.uix.context_menu import ContextMenu
 
 
 class EmptyLabel(Factory.Label):
@@ -121,7 +121,7 @@ class AddressesDialog(Factory.Popup):
 
         ci.memo = label
         ci.amount = self.app.format_amount_and_units(balance)
-        request = self.app.wallet.get_payment_request(addr, self.app.electrum_config)
+        request = self.app.wallet.get_payment_request(addr, self.app.denariium_config)
         if is_used:
             ci.status = _('Used')
         else:
@@ -167,7 +167,7 @@ class AddressesDialog(Factory.Popup):
         self.app.show_request(obj.address)
 
     def do_view(self, obj):
-        req = self.app.wallet.get_payment_request(obj.address, self.app.electrum_config)
+        req = self.app.wallet.get_payment_request(obj.address, self.app.denariium_config)
         if req:
             c, u, x = self.app.wallet.get_addr_balance(obj.address)
             balance = c + u + x
@@ -197,7 +197,7 @@ class AddressesDialog(Factory.Popup):
         from .dialogs.question import Question
         def cb(result):
             if result:
-                self.app.wallet.remove_payment_request(obj.address, self.app.electrum_config)
+                self.app.wallet.remove_payment_request(obj.address, self.app.denariium_config)
                 self.update()
         d = Question(_('Delete request?'), cb)
         d.open()

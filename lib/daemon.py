@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Electrum - lightweight Bitcoin client
+# Denariium - lightweight Denarius client
 # Copyright (C) 2015 Thomas Voegtlin
 #
 # Permission is hereby granted, free of charge, to any person
@@ -32,7 +32,7 @@ import sys
 import jsonrpclib
 from .jsonrpc import VerifyingJSONRPCServer
 
-from .version import ELECTRUM_VERSION
+from .version import DENARIIUM_VERSION
 from .network import Network
 from .util import json_decode, DaemonThread
 from .util import print_error, to_string
@@ -193,7 +193,7 @@ class Daemon(DaemonThread):
                     'spv_nodes': len(self.network.get_interfaces()),
                     'connected': self.network.is_connected(),
                     'auto_connect': p[4],
-                    'version': ELECTRUM_VERSION,
+                    'version': DENARIIUM_VERSION,
                     'wallets': {k: w.is_up_to_date()
                                 for k, w in self.wallets.items()},
                     'fee_per_kb': self.config.fee_per_kb(),
@@ -214,9 +214,9 @@ class Daemon(DaemonThread):
             #    response = "ok"
             #else:
             #    response = "error: current GUI does not support multiple windows"
-            response = "error: Electrum GUI already running"
+            response = "error: Denariium GUI already running"
         else:
-            response = "Error: Electrum is running in daemon mode. Please stop the daemon first."
+            response = "Error: Denariium is running in daemon mode. Please stop the daemon first."
         return response
 
     def load_wallet(self, path, password):
@@ -264,7 +264,7 @@ class Daemon(DaemonThread):
             path = config.get_wallet_path()
             wallet = self.wallets.get(path)
             if wallet is None:
-                return {'error': 'Wallet "%s" is not loaded. Use "electrum daemon load_wallet"'%os.path.basename(path) }
+                return {'error': 'Wallet "%s" is not loaded. Use "denariium daemon load_wallet"'%os.path.basename(path) }
         else:
             wallet = None
         # arguments passed to function
@@ -300,8 +300,8 @@ class Daemon(DaemonThread):
         gui_name = config.get('gui', 'qt')
         if gui_name in ['lite', 'classic']:
             gui_name = 'qt'
-        gui = __import__('electrum_gui.' + gui_name, fromlist=['electrum_gui'])
-        self.gui = gui.ElectrumGui(config, self, plugins)
+        gui = __import__('denariium_gui.' + gui_name, fromlist=['denariium_gui'])
+        self.gui = gui.DenariiumGui(config, self, plugins)
         try:
             self.gui.main()
         except BaseException as e:

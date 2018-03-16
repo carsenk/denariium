@@ -1,22 +1,22 @@
 from decimal import Decimal
 _ = lambda x:x
 #from i18n import _
-from electrum import WalletStorage, Wallet
-from electrum.util import format_satoshis, set_verbosity
-from electrum.bitcoin import is_address, COIN, TYPE_ADDRESS
+from denariium import WalletStorage, Wallet
+from denariium.util import format_satoshis, set_verbosity
+from denariium.denarius import is_address, COIN, TYPE_ADDRESS
 import getpass, datetime
 
 # minimal fdisk like gui for console usage
 # written by rofl0r, with some bits stolen from the text gui (ncurses)
 
-class ElectrumGui:
+class DenariiumGui:
 
     def __init__(self, config, daemon, plugins):
         self.config = config
         self.network = daemon.network
         storage = WalletStorage(config.get_wallet_path())
         if not storage.file_exists:
-            print("Wallet not found. try 'electrum create'")
+            print("Wallet not found. try 'denariium create'")
             exit()
         if storage.is_encrypted():
             password = getpass.getpass('Password:', stream=None)
@@ -163,7 +163,7 @@ class ElectrumGui:
 
     def do_send(self):
         if not is_address(self.str_recipient):
-            print(_('Invalid Bitcoin address'))
+            print(_('Invalid Denarius address'))
             return
         try:
             amount = int(Decimal(self.str_amount) * COIN)
@@ -208,12 +208,12 @@ class ElectrumGui:
             print(_('Error'))
 
     def network_dialog(self):
-        print("use 'electrum setconfig server/proxy' to change your network settings")
+        print("use 'denariium setconfig server/proxy' to change your network settings")
         return True
 
 
     def settings_dialog(self):
-        print("use 'electrum setconfig' to change your settings")
+        print("use 'denariium setconfig' to change your settings")
         return True
 
     def password_dialog(self):

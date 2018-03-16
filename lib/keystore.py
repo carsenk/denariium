@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 # -*- mode: python -*-
 #
-# Electrum - lightweight Bitcoin client
-# Copyright (C) 2016  The Electrum developers
+# Denariium - lightweight Denarius client
+# Copyright (C) 2016  The Denariium developers
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -26,8 +26,8 @@
 
 from unicodedata import normalize
 
-from . import bitcoin
-from .bitcoin import *
+from . import denarius
+from .denarius import *
 from . import constants
 from .util import PrintError, InvalidPassword, hfu
 from .mnemonic import Mnemonic, load_wordlist
@@ -161,7 +161,7 @@ class Imported_KeyStore(Software_KeyStore):
             if x_pubkey in self.keypairs.keys():
                 return x_pubkey
         elif x_pubkey[0:2] == 'fd':
-            addr = bitcoin.script_to_address(x_pubkey[2:])
+            addr = denarius.script_to_address(x_pubkey[2:])
             if addr in self.addresses:
                 return self.addresses[addr].get('pubkey')
 
@@ -240,19 +240,19 @@ class Xpub:
         return bh2u(cK)
 
     def get_xpubkey(self, c, i):
-        s = ''.join(map(lambda x: bitcoin.int_to_hex(x,2), (c, i)))
-        return 'ff' + bh2u(bitcoin.DecodeBase58Check(self.xpub)) + s
+        s = ''.join(map(lambda x: denarius.int_to_hex(x,2), (c, i)))
+        return 'ff' + bh2u(denarius.DecodeBase58Check(self.xpub)) + s
 
     @classmethod
     def parse_xpubkey(self, pubkey):
         assert pubkey[0:2] == 'ff'
         pk = bfh(pubkey)
         pk = pk[1:]
-        xkey = bitcoin.EncodeBase58Check(pk[0:78])
+        xkey = denarius.EncodeBase58Check(pk[0:78])
         dd = pk[78:]
         s = []
         while dd:
-            n = int(bitcoin.rev_hex(bh2u(dd[0:2])), 16)
+            n = int(denarius.rev_hex(bh2u(dd[0:2])), 16)
             dd = dd[2:]
             s.append(n)
         assert len(s) == 2
@@ -312,7 +312,7 @@ class BIP32_KeyStore(Deterministic_KeyStore, Xpub):
 
     def add_xprv(self, xprv):
         self.xprv = xprv
-        self.xpub = bitcoin.xpub_from_xprv(xprv)
+        self.xpub = denarius.xpub_from_xprv(xprv)
 
     def add_xprv_from_seed(self, bip32_seed, xtype, derivation):
         xprv, xpub = bip32_root(bip32_seed, xtype)
@@ -430,7 +430,7 @@ class Old_KeyStore(Deterministic_KeyStore):
         return self.mpk
 
     def get_xpubkey(self, for_change, n):
-        s = ''.join(map(lambda x: bitcoin.int_to_hex(x,2), (for_change, n)))
+        s = ''.join(map(lambda x: denarius.int_to_hex(x,2), (for_change, n)))
         return 'fe' + self.mpk + s
 
     @classmethod
@@ -441,7 +441,7 @@ class Old_KeyStore(Deterministic_KeyStore):
         dd = pk[128:]
         s = []
         while dd:
-            n = int(bitcoin.rev_hex(dd[0:4]), 16)
+            n = int(denarius.rev_hex(dd[0:4]), 16)
             dd = dd[4:]
             s.append(n)
         assert len(s) == 2
@@ -604,7 +604,7 @@ def parse_xpubkey(x_pubkey):
 
 def xpubkey_to_address(x_pubkey):
     if x_pubkey[0:2] == 'fd':
-        address = bitcoin.script_to_address(x_pubkey[2:])
+        address = denarius.script_to_address(x_pubkey[2:])
         return x_pubkey, address
     if x_pubkey[0:2] in ['02', '03', '04']:
         pubkey = x_pubkey
@@ -665,14 +665,14 @@ def is_old_mpk(mpk):
 
 def is_address_list(text):
     parts = text.split()
-    return bool(parts) and all(bitcoin.is_address(x) for x in parts)
+    return bool(parts) and all(denarius.is_address(x) for x in parts)
 
 
 def get_private_keys(text):
     parts = text.split('\n')
     parts = map(lambda x: ''.join(x.split()), parts)
     parts = list(filter(bool, parts))
-    if bool(parts) and all(bitcoin.is_private_key(x) for x in parts):
+    if bool(parts) and all(denarius.is_private_key(x) for x in parts):
         return parts
 
 
@@ -729,7 +729,7 @@ def from_xpub(xpub):
     return k
 
 def from_xprv(xprv):
-    xpub = bitcoin.xpub_from_xprv(xprv)
+    xpub = denarius.xpub_from_xprv(xprv)
     k = BIP32_KeyStore({})
     k.xprv = xprv
     k.xpub = xpub

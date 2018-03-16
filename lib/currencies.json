@@ -22,7 +22,7 @@
         "BOB",
         "BRL",
         "BSD",
-        "BTC",
+        "DNR",
         "BTN",
         "BWP",
         "BZD",
@@ -163,7 +163,7 @@
     "BitStamp": [
         "USD"
     ],
-    "BitcoinAverage": [
+    "DenariusAverage": [
         "AED",
         "AFN",
         "ALL",
@@ -387,7 +387,7 @@
         "BOB",
         "BRL",
         "BSD",
-        "BTC",
+        "DNR",
         "BTN",
         "BWP",
         "BYR",
@@ -717,7 +717,7 @@
         "JPY",
         "USD"
     ],
-    "LocalBitcoins": [
+    "LocalDenariuss": [
         "AED",
         "ARS",
         "AUD",
@@ -787,7 +787,7 @@
         "ZAR",
         "ZMW"
     ],
-    "MercadoBitcoin": [
+    "MercadoDenarius": [
         "BRL"
     ],
     "NegocieCoins": [

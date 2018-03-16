@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Electrum - lightweight Bitcoin client
+# Denariium - lightweight Denarius client
 # Copyright (C) 2014 Thomas Voegtlin
 #
 # Permission is hereby granted, free of charge, to any person
@@ -37,7 +37,7 @@ try:
 except ImportError:
     sys.exit("Error: could not find paymentrequest_pb2.py. Create it with 'protoc --proto_path=lib/ --python_out=lib/ lib/paymentrequest.proto'")
 
-from . import bitcoin
+from . import denarius
 from . import util
 from .util import print_error, bh2u, bfh
 from .util import export_meta, import_meta
@@ -45,10 +45,10 @@ from . import transaction
 from . import x509
 from . import rsakey
 
-from .bitcoin import TYPE_ADDRESS
+from .denarius import TYPE_ADDRESS
 
-REQUEST_HEADERS = {'Accept': 'application/bitcoin-paymentrequest', 'User-Agent': 'Electrum'}
-ACK_HEADERS = {'Content-Type':'application/bitcoin-payment','Accept':'application/bitcoin-paymentack','User-Agent':'Electrum'}
+REQUEST_HEADERS = {'Accept': 'application/denarius-paymentrequest', 'User-Agent': 'Denariium'}
+ACK_HEADERS = {'Content-Type':'application/denarius-payment','Accept':'application/denarius-paymentack','User-Agent':'Denariium'}
 
 ca_path = requests.certs.where()
 ca_list = None
@@ -76,9 +76,9 @@ def get_payment_request(url):
         try:
             response = requests.request('GET', url, headers=REQUEST_HEADERS)
             response.raise_for_status()
-            # Guard against `bitcoin:`-URIs with invalid payment request URLs
+            # Guard against `denarius:`-URIs with invalid payment request URLs
             if "Content-Type" not in response.headers \
-            or response.headers["Content-Type"] != "application/bitcoin-paymentrequest":
+            or response.headers["Content-Type"] != "application/denarius-paymentrequest":
                 data = None
                 error = "payment URL not pointing to a payment request handling server"
             else:
@@ -115,7 +115,7 @@ class PaymentRequest:
     def parse(self, r):
         if self.error:
             return
-        self.id = bh2u(bitcoin.sha256(r)[0:16])
+        self.id = bh2u(denarius.sha256(r)[0:16])
         try:
             self.data = pb2.PaymentRequest()
             self.data.ParseFromString(r)
@@ -208,7 +208,7 @@ class PaymentRequest:
             address = info.get('address')
             pr.signature = ''
             message = pr.SerializeToString()
-            if bitcoin.verify_message(address, sig, message):
+            if denarius.verify_message(address, sig, message):
                 self.error = 'Verified with DNSSEC'
                 return True
             else:
@@ -267,7 +267,7 @@ class PaymentRequest:
         paymnt.transactions.append(bfh(raw_tx))
         ref_out = paymnt.refund_to.add()
         ref_out.script = util.bfh(transaction.Transaction.pay_script(TYPE_ADDRESS, refund_addr))
-        paymnt.memo = "Paid using Electrum"
+        paymnt.memo = "Paid using Denariium"
         pm = paymnt.SerializeToString()
         payurl = urllib.parse.urlparse(pay_det.payment_url)
         try:
@@ -321,9 +321,9 @@ def sign_request_with_alias(pr, alias, alias_privkey):
     pr.pki_type = 'dnssec+btc'
     pr.pki_data = str(alias)
     message = pr.SerializeToString()
-    ec_key = bitcoin.regenerate_key(alias_privkey)
-    address = bitcoin.address_from_private_key(alias_privkey)
-    compressed = bitcoin.is_compressed(alias_privkey)
+    ec_key = denarius.regenerate_key(alias_privkey)
+    address = denarius.address_from_private_key(alias_privkey)
+    compressed = denarius.is_compressed(alias_privkey)
     pr.signature = ec_key.sign_message(message, compressed, address)
 
 

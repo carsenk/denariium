@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NAME_ROOT=electrum
+NAME_ROOT=denariium
 PYTHON_VERSION=3.5.4
 
 # These settings probably don't need any change
@@ -19,7 +19,7 @@ set -e
 mkdir -p tmp
 cd tmp
 
-for repo in electrum electrum-locale electrum-icons; do
+for repo in denariium denariium-locale denariium-icons; do
     if [ -d $repo ]; then
 	cd $repo
 	git pull
@@ -31,15 +31,15 @@ for repo in electrum electrum-locale electrum-icons; do
     fi
 done
 
-pushd electrum-locale
+pushd denariium-locale
 for i in ./locale/*; do
     dir=$i/LC_MESSAGES
     mkdir -p $dir
-    msgfmt --output-file=$dir/electrum.mo $i/electrum.po || true
+    msgfmt --output-file=$dir/denariium.mo $i/denariium.po || true
 done
 popd
 
-pushd electrum
+pushd denariium
 if [ ! -z "$1" ]; then
     git checkout $1
 fi
@@ -49,18 +49,18 @@ echo "Last commit: $VERSION"
 find -exec touch -d '2000-11-11T11:11:11+00:00' {} +
 popd
 
-rm -rf $WINEPREFIX/drive_c/electrum
-cp -r electrum $WINEPREFIX/drive_c/electrum
-cp electrum/LICENCE .
-cp -r electrum-locale/locale $WINEPREFIX/drive_c/electrum/lib/
-cp electrum-icons/icons_rc.py $WINEPREFIX/drive_c/electrum/gui/qt/
+rm -rf $WINEPREFIX/drive_c/denariium
+cp -r denariium $WINEPREFIX/drive_c/denariium
+cp denariium/LICENCE .
+cp -r denariium-locale/locale $WINEPREFIX/drive_c/denariium/lib/
+cp denariium-icons/icons_rc.py $WINEPREFIX/drive_c/denariium/gui/qt/
 
 # Install frozen dependencies
 $PYTHON -m pip install -r ../../deterministic-build/requirements.txt
 
 $PYTHON -m pip install -r ../../deterministic-build/requirements-hw.txt
 
-pushd $WINEPREFIX/drive_c/electrum
+pushd $WINEPREFIX/drive_c/denariium
 $PYTHON setup.py install
 popd
 
@@ -77,12 +77,12 @@ find -exec touch -d '2000-11-11T11:11:11+00:00' {} +
 popd
 
 # build NSIS installer
-# $VERSION could be passed to the electrum.nsi script, but this would require some rewriting in the script iself.
-wine "$WINEPREFIX/drive_c/Program Files (x86)/NSIS/makensis.exe" /DPRODUCT_VERSION=$VERSION electrum.nsi
+# $VERSION could be passed to the denariium.nsi script, but this would require some rewriting in the script iself.
+wine "$WINEPREFIX/drive_c/Program Files (x86)/NSIS/makensis.exe" /DPRODUCT_VERSION=$VERSION denariium.nsi
 
 cd dist
-mv electrum-setup.exe $NAME_ROOT-$VERSION-setup.exe
+mv denariium-setup.exe $NAME_ROOT-$VERSION-setup.exe
 cd ..
 
 echo "Done."
-md5sum dist/electrum*exe
+md5sum dist/denariium*exe

@@ -1,4 +1,4 @@
-# Electrum - lightweight Bitcoin client
+# Denariium - lightweight Denarius client
 # Copyright (C) 2012 thomasv@ecdsa.org
 #
 # Permission is hereby granted, free of charge, to any person
@@ -24,9 +24,9 @@ import os
 import threading
 
 from . import util
-from . import bitcoin
+from . import denarius
 from . import constants
-from .bitcoin import *
+from .denarius import *
 
 MAX_TARGET = 0x00000000FFFF0000000000000000000000000000000000000000000000000000
 

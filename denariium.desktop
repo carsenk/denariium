@@ -1,0 +1,17 @@
+# If you want denariium to appear in a linux app launcher ("start menu"), install this by doing:
+# sudo desktop-file-install denariium.desktop
+
+[Desktop Entry]
+Comment=Lightweight Denarius Client
+Exec=denariium %u
+GenericName[en_US]=Denarius Wallet
+GenericName=Denarius Wallet
+Icon=denariium
+Name[en_US]=Denariium Denarius Wallet
+Name=Denariium Denarius Wallet
+Categories=Finance;Network;
+StartupNotify=false
+Terminal=false
+Type=Application
+MimeType=x-scheme-handler/denarius;
+

@@ -1,17 +1,17 @@
 //
-// Simple Bitcoin Payment Protocol messages
+// Simple Denarius Payment Protocol messages
 //
 // Use fields 1000+ for extensions;
 // to avoid conflicts, register extensions via pull-req at
-// https://github.com/bitcoin/bips/bip-0070/extensions.mediawiki
+// https://github.com/denarius/bips/bip-0070/extensions.mediawiki
 //
 
 syntax = "proto2";
 package payments;
-option java_package = "org.bitcoin.protocols.payments";
+option java_package = "org.denarius.protocols.payments";
 option java_outer_classname = "Protos";
 
-// Generalized form of "send payment to this/these bitcoin addresses"
+// Generalized form of "send payment to this/these denarius addresses"
 message Output {
         optional uint64 amount = 1 [default = 0]; // amount is integer-number-of-satoshis
         required bytes script = 2; // usually one of the standard Script forms

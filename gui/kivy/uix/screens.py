@@ -17,15 +17,15 @@ from kivy.lang import Builder
 from kivy.factory import Factory
 from kivy.utils import platform
 
-from electrum.util import profiler, parse_URI, format_time, InvalidPassword, NotEnoughFunds
-from electrum import bitcoin
-from electrum.util import timestamp_to_datetime
-from electrum.paymentrequest import PR_UNPAID, PR_PAID, PR_UNKNOWN, PR_EXPIRED
+from denariium.util import profiler, parse_URI, format_time, InvalidPassword, NotEnoughFunds
+from denariium import denarius
+from denariium.util import timestamp_to_datetime
+from denariium.paymentrequest import PR_UNPAID, PR_PAID, PR_UNKNOWN, PR_EXPIRED
 
 from .context_menu import ContextMenu
 
 
-from electrum_gui.kivy.i18n import _
+from denariium_gui.kivy.i18n import _
 
 
 class CScreen(Factory.Screen):
@@ -168,11 +168,11 @@ class SendScreen(CScreen):
     payment_request = None
 
     def set_URI(self, text):
-        import electrum
+        import denariium
         try:
-            uri = electrum.util.parse_URI(text, self.app.on_pr)
+            uri = denariium.util.parse_URI(text, self.app.on_pr)
         except:
-            self.app.show_info(_("Not a Bitcoin URI"))
+            self.app.show_info(_("Not a Denarius URI"))
             return
         amount = uri.get('amount')
         self.screen.address = uri.get('address', '')
@@ -210,7 +210,7 @@ class SendScreen(CScreen):
             # it sould be already saved
             return
         # save address as invoice
-        from electrum.paymentrequest import make_unsigned_request, PaymentRequest
+        from denariium.paymentrequest import make_unsigned_request, PaymentRequest
         req = {'address':self.screen.address, 'memo':self.screen.message}
         amount = self.app.get_amount(self.screen.amount) if self.screen.amount else 0
         req['amount'] = amount
@@ -241,20 +241,20 @@ class SendScreen(CScreen):
         else:
             address = str(self.screen.address)
             if not address:
-                self.app.show_error(_('Recipient not specified.') + ' ' + _('Please scan a Bitcoin address or a payment request'))
+                self.app.show_error(_('Recipient not specified.') + ' ' + _('Please scan a Denarius address or a payment request'))
                 return
-            if not bitcoin.is_address(address):
-                self.app.show_error(_('Invalid Bitcoin Address') + ':\n' + address)
+            if not denarius.is_address(address):
+                self.app.show_error(_('Invalid Denarius Address') + ':\n' + address)
                 return
             try:
                 amount = self.app.get_amount(self.screen.amount)
             except:
                 self.app.show_error(_('Invalid amount') + ':\n' + self.screen.amount)
                 return
-            outputs = [(bitcoin.TYPE_ADDRESS, address, amount)]
+            outputs = [(denarius.TYPE_ADDRESS, address, amount)]
         message = self.screen.message
         amount = sum(map(lambda x:x[2], outputs))
-        if self.app.electrum_config.get('use_rbf'):
+        if self.app.denariium_config.get('use_rbf'):
             from .dialogs.question import Question
             d = Question(_('Should this transaction be replaceable?'), lambda b: self._do_send(amount, message, outputs, b))
             d.open()
@@ -263,7 +263,7 @@ class SendScreen(CScreen):
 
     def _do_send(self, amount, message, outputs, rbf):
         # make unsigned transaction
-        config = self.app.electrum_config
+        config = self.app.denariium_config
         coins = self.app.wallet.get_spendable_coins(None, config)
         try:
             tx = self.app.wallet.make_unsigned_transaction(coins, outputs, config, None)
@@ -334,7 +334,7 @@ class ReceiveScreen(CScreen):
         return b
 
     def on_address(self, addr):
-        req = self.app.wallet.get_payment_request(addr, self.app.electrum_config)
+        req = self.app.wallet.get_payment_request(addr, self.app.denariium_config)
         self.screen.status = ''
         if req:
             self.screen.message = req.get('memo', '')
@@ -345,7 +345,7 @@ class ReceiveScreen(CScreen):
         Clock.schedule_once(lambda dt: self.update_qr())
 
     def get_URI(self):
-        from electrum.util import create_URI
+        from denariium.util import create_URI
         amount = self.screen.amount
         if amount:
             a, u = self.screen.amount.split()
@@ -361,7 +361,7 @@ class ReceiveScreen(CScreen):
 
     def do_share(self):
         uri = self.get_URI()
-        self.app.do_share(uri, _("Share Bitcoin Request"))
+        self.app.do_share(uri, _("Share Denarius Request"))
 
     def do_copy(self):
         uri = self.get_URI()
@@ -376,7 +376,7 @@ class ReceiveScreen(CScreen):
         message = self.screen.message
         amount = self.app.get_amount(amount) if amount else 0
         req = self.app.wallet.make_payment_request(addr, amount, message, None)
-        self.app.wallet.add_payment_request(req, self.app.electrum_config)
+        self.app.wallet.add_payment_request(req, self.app.denariium_config)
         self.app.update_tab('requests')
 
     def on_amount_or_message(self):

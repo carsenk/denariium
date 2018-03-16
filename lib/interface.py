@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Electrum - lightweight Bitcoin client
+# Denariium - lightweight Denarius client
 # Copyright (C) 2011 thomasv@gitorious
 #
 # Permission is hereby granted, free of charge, to any person
@@ -43,7 +43,7 @@ from . import pem
 
 
 def Connection(server, queue, config_path):
-    """Makes asynchronous connections to a remote electrum server.
+    """Makes asynchronous connections to a remote denariium server.
     Returns the running thread that is making the connection.
 
     Once the thread has connected, it finishes, placing a tuple on the
@@ -240,7 +240,7 @@ class TcpConnection(threading.Thread, util.PrintError):
 
 class Interface(util.PrintError):
     """The Interface class handles a socket connected to a single remote
-    electrum server.  It's exposed API is:
+    denariium server.  It's exposed API is:
 
     - Member functions close(), fileno(), get_responses(), has_timed_out(),
       ping_required(), queue_request(), send_requests()

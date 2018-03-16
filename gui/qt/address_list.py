@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Electrum - lightweight Bitcoin client
+# Denariium - lightweight Denarius client
 # Copyright (C) 2015 Thomas Voegtlin
 #
 # Permission is hereby granted, free of charge, to any person
@@ -24,10 +24,10 @@
 # SOFTWARE.
 import webbrowser
 
-from electrum.i18n import _
-from electrum.util import block_explorer_URL
-from electrum.plugins import run_hook
-from electrum.bitcoin import is_address
+from denariium.i18n import _
+from denariium.util import block_explorer_URL
+from denariium.plugins import run_hook
+from denariium.denarius import is_address
 
 from .util import *
 
@@ -133,7 +133,7 @@ class AddressList(MyTreeWidget):
                 self.setCurrentItem(address_item)
 
     def create_menu(self, position):
-        from electrum.wallet import Multisig_Wallet
+        from denariium.wallet import Multisig_Wallet
         is_multisig = isinstance(self.wallet, Multisig_Wallet)
         can_delete = self.wallet.can_delete_address()
         selected = self.selectedItems()

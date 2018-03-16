@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Electrum - lightweight Bitcoin client
+# Denariium - lightweight Denarius client
 # Copyright (C) 2014 Thomas Voegtlin
 #
 # Permission is hereby granted, free of charge, to any person
@@ -30,20 +30,20 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import QPushButton
 
-from electrum import bitcoin, util
-from electrum import transaction
-from electrum.plugins import BasePlugin, hook
-from electrum.i18n import _
-from electrum.wallet import Multisig_Wallet
-from electrum.util import bh2u, bfh
+from denariium import denarius, util
+from denariium import transaction
+from denariium.plugins import BasePlugin, hook
+from denariium.i18n import _
+from denariium.wallet import Multisig_Wallet
+from denariium.util import bh2u, bfh
 
-from electrum_gui.qt.transaction_dialog import show_transaction
+from denariium_gui.qt.transaction_dialog import show_transaction
 
 import sys
 import traceback
 
 
-server = ServerProxy('https://cosigner.electrum.org/', allow_none=True)
+server = ServerProxy('https://cosigner.denariium.org/', allow_none=True)
 
 
 class Listener(util.DaemonThread):
@@ -131,8 +131,8 @@ class Plugin(BasePlugin):
         self.cosigner_list = []
         for key, keystore in wallet.keystores.items():
             xpub = keystore.get_master_public_key()
-            K = bitcoin.deserialize_xpub(xpub)[-1]
-            _hash = bh2u(bitcoin.Hash(K))
+            K = denarius.deserialize_xpub(xpub)[-1]
+            _hash = bh2u(denarius.Hash(K))
             if not keystore.is_watching_only():
                 self.keys.append((key, _hash, window))
             else:
@@ -160,7 +160,7 @@ class Plugin(BasePlugin):
             d.cosigner_send_button.hide()
 
     def cosigner_can_sign(self, tx, cosigner_xpub):
-        from electrum.keystore import is_xpubkey, parse_xpubkey
+        from denariium.keystore import is_xpubkey, parse_xpubkey
         xpub_set = set([])
         for txin in tx.inputs():
             for x_pubkey in txin['x_pubkeys']:
@@ -174,7 +174,7 @@ class Plugin(BasePlugin):
             if not self.cosigner_can_sign(tx, xpub):
                 continue
             raw_tx_bytes = bfh(str(tx))
-            message = bitcoin.encrypt_message(raw_tx_bytes, bh2u(K)).decode('ascii')
+            message = denarius.encrypt_message(raw_tx_bytes, bh2u(K)).decode('ascii')
             try:
                 server.put(_hash, message)
             except Exception as e:
@@ -206,8 +206,8 @@ class Plugin(BasePlugin):
         if not xprv:
             return
         try:
-            k = bh2u(bitcoin.deserialize_xprv(xprv)[-1])
-            EC = bitcoin.EC_KEY(bfh(k))
+            k = bh2u(denarius.deserialize_xprv(xprv)[-1])
+            EC = denarius.EC_KEY(bfh(k))
             message = bh2u(EC.decrypt_message(message))
         except Exception as e:
             traceback.print_exc(file=sys.stdout)

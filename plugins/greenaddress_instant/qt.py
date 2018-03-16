@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Electrum - lightweight Bitcoin client
+# Denariium - lightweight Denarius client
 # Copyright (C) 2014 Thomas Voegtlin
 #
 # Permission is hereby granted, free of charge, to any person
@@ -30,8 +30,8 @@ import requests
 
 from PyQt5.QtWidgets import QApplication, QPushButton
 
-from electrum.plugins import BasePlugin, hook
-from electrum.i18n import _
+from denariium.plugins import BasePlugin, hook
+from denariium.i18n import _
 
 
 
@@ -91,7 +91,7 @@ class Plugin(BasePlugin):
 
             # 2. send the request
             response = requests.request("GET", ("https://greenaddress.it/verify/?signature=%s&txhash=%s" % (urllib.parse.quote(sig), tx.txid())),
-                                        headers = {'User-Agent': 'Electrum'})
+                                        headers = {'User-Agent': 'Denariium'})
             response = response.json()
 
             # 3. display the result

@@ -1,11 +1,11 @@
 import select, time, queue
-# import electrum
-from electrum import Connection, Interface, SimpleConfig
+# import denariium
+from denariium import Connection, Interface, SimpleConfig
 
-from electrum.network import parse_servers
+from denariium.network import parse_servers
 from collections import defaultdict
 
-# electrum.util.set_verbosity(1)
+# denariium.util.set_verbosity(1)
 def get_interfaces(servers, timeout=10):
     '''Returns a map of servers to connected interfaces.  If any
     connections fail or timeout, they will be missing from the map.

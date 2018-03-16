@@ -15,17 +15,17 @@ string = string.replace("##VERSION_ANDROID##", version_android)
 string = string.replace("##VERSION_APK##", version_apk)
 
 files = {
-    'tgz': "Electrum-%s.tar.gz" % version,
-    'zip': "Electrum-%s.zip" % version,
-    'mac': "electrum-%s.dmg" % version_mac,
-    'win': "electrum-%s.exe" % version_win,
-    'win_setup': "electrum-%s-setup.exe" % version_win,
-    'win_portable': "electrum-%s-portable.exe" % version_win,
+    'tgz': "Denariium-%s.tar.gz" % version,
+    'zip': "Denariium-%s.zip" % version,
+    'mac': "denariium-%s.dmg" % version_mac,
+    'win': "denariium-%s.exe" % version_win,
+    'win_setup': "denariium-%s-setup.exe" % version_win,
+    'win_portable': "denariium-%s-portable.exe" % version_win,
 }
 
 for k, n in files.items():
     path = "dist/%s"%n
-    link = "https://download.electrum.org/%s/%s"%(version,n)
+    link = "https://download.denariium.org/%s/%s"%(version,n)
     if not os.path.exists(path):
         os.system("wget -q %s -O %s" % (link, path))
     if not os.path.getsize(path):

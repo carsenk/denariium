@@ -1,4 +1,4 @@
-# Electrum - Lightweight Bitcoin Client
+# Denariium - Lightweight Denarius Client
 # Copyright (c) 2012 Thomas Voegtlin
 #
 # Permission is hereby granted, free of charge, to any person
@@ -21,7 +21,7 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 from .util import ThreadJob
-from .bitcoin import *
+from .denarius import *
 
 
 class SPV(ThreadJob):

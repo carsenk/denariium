@@ -74,10 +74,10 @@ Builder.load_string('''
 ''')
 
 from kivy.properties import BooleanProperty
-from electrum_gui.kivy.i18n import _
-from electrum.util import format_time
-from electrum.paymentrequest import PR_UNPAID, PR_PAID, PR_UNKNOWN, PR_EXPIRED
-from electrum_gui.kivy.uix.context_menu import ContextMenu
+from denariium_gui.kivy.i18n import _
+from denariium.util import format_time
+from denariium.paymentrequest import PR_UNPAID, PR_PAID, PR_UNKNOWN, PR_EXPIRED
+from denariium_gui.kivy.uix.context_menu import ContextMenu
 
 pr_icon = {
     PR_UNPAID: 'atlas://gui/kivy/theming/light/important',
@@ -126,7 +126,7 @@ class RequestsDialog(Factory.Popup):
         self.menu_actions = [(_('Show'), self.do_show), (_('Delete'), self.do_delete)]
         requests_list = self.ids.requests_container
         requests_list.clear_widgets()
-        _list = self.app.wallet.get_sorted_requests(self.app.electrum_config)
+        _list = self.app.wallet.get_sorted_requests(self.app.denariium_config)
         for pr in _list:
             ci = self.get_card(pr)
             requests_list.add_widget(ci)
@@ -140,7 +140,7 @@ class RequestsDialog(Factory.Popup):
         from .question import Question
         def cb(result):
             if result:
-                self.app.wallet.remove_payment_request(req.address, self.app.electrum_config)
+                self.app.wallet.remove_payment_request(req.address, self.app.denariium_config)
                 self.hide_menu()
                 self.update()
         d = Question(_('Delete request'), cb)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Electrum - lightweight Bitcoin client
+# Denariium - lightweight Denarius client
 # Copyright (C) 2012 thomasv@gitorious
 #
 # Permission is hereby granted, free of charge, to any person
@@ -38,14 +38,14 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 import PyQt5.QtCore as QtCore
 
-from electrum.i18n import _, set_language
-from electrum.plugins import run_hook
-from electrum import WalletStorage
-# from electrum.synchronizer import Synchronizer
-# from electrum.verifier import SPV
-# from electrum.util import DebugMem
-from electrum.util import UserCancelled, print_error
-# from electrum.wallet import Abstract_Wallet
+from denariium.i18n import _, set_language
+from denariium.plugins import run_hook
+from denariium import WalletStorage
+# from denariium.synchronizer import Synchronizer
+# from denariium.verifier import SPV
+# from denariium.util import DebugMem
+from denariium.util import UserCancelled, print_error
+# from denariium.wallet import Abstract_Wallet
 
 from .installwizard import InstallWizard, GoBack
 
@@ -55,11 +55,11 @@ try:
 except Exception as e:
     print(e)
     print("Error: Could not find icons file.")
-    print("Please run 'pyrcc5 icons.qrc -o gui/qt/icons_rc.py', and reinstall Electrum")
+    print("Please run 'pyrcc5 icons.qrc -o gui/qt/icons_rc.py', and reinstall Denariium")
     sys.exit(1)
 
 from .util import *   # * needed for plugins
-from .main_window import ElectrumWindow
+from .main_window import DenariiumWindow
 from .network_dialog import NetworkDialog
 
 
@@ -76,7 +76,7 @@ class OpenFileEventFilter(QObject):
         return False
 
 
-class QElectrumApplication(QApplication):
+class QDenariiumApplication(QApplication):
     new_window_signal = pyqtSignal(str, object)
 
 
@@ -84,25 +84,25 @@ class QNetworkUpdatedSignalObject(QObject):
     network_updated_signal = pyqtSignal(str, object)
 
 
-class ElectrumGui:
+class DenariiumGui:
 
     def __init__(self, config, daemon, plugins):
         set_language(config.get('language'))
         # Uncomment this call to verify objects are being properly
         # GC-ed when windows are closed
         #network.add_jobs([DebugMem([Abstract_Wallet, SPV, Synchronizer,
-        #                            ElectrumWindow], interval=5)])
+        #                            DenariiumWindow], interval=5)])
         QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_X11InitThreads)
         if hasattr(QtCore.Qt, "AA_ShareOpenGLContexts"):
             QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
         if hasattr(QGuiApplication, 'setDesktopFileName'):
-            QGuiApplication.setDesktopFileName('electrum.desktop')
+            QGuiApplication.setDesktopFileName('denariium.desktop')
         self.config = config
         self.daemon = daemon
         self.plugins = plugins
         self.windows = []
         self.efilter = OpenFileEventFilter(self.windows)
-        self.app = QElectrumApplication(sys.argv)
+        self.app = QDenariiumApplication(sys.argv)
         self.app.installEventFilter(self.efilter)
         self.timer = Timer()
         self.nd = None
@@ -110,7 +110,7 @@ class ElectrumGui:
         # init tray
         self.dark_icon = self.config.get("dark_icon", False)
         self.tray = QSystemTrayIcon(self.tray_icon(), None)
-        self.tray.setToolTip('Electrum')
+        self.tray.setToolTip('Denariium')
         self.tray.activated.connect(self.tray_activated)
         self.build_tray_menu()
         self.tray.show()
@@ -132,13 +132,13 @@ class ElectrumGui:
             submenu.addAction(_("Close"), window.close)
         m.addAction(_("Dark/Light"), self.toggle_tray_icon)
         m.addSeparator()
-        m.addAction(_("Exit Electrum"), self.close)
+        m.addAction(_("Exit Denariium"), self.close)
 
     def tray_icon(self):
         if self.dark_icon:
-            return QIcon(':icons/electrum_dark_icon.png')
+            return QIcon(':icons/denariium_dark_icon.png')
         else:
-            return QIcon(':icons/electrum_light_icon.png')
+            return QIcon(':icons/denariium_light_icon.png')
 
     def toggle_tray_icon(self):
         self.dark_icon = not self.dark_icon
@@ -164,7 +164,7 @@ class ElectrumGui:
 
     def show_network_dialog(self, parent):
         if not self.daemon.network:
-            parent.show_warning(_('You are using Electrum in offline mode; restart Electrum if you want to get connected'), title=_('Offline'))
+            parent.show_warning(_('You are using Denariium in offline mode; restart Denariium if you want to get connected'), title=_('Offline'))
             return
         if self.nd:
             self.nd.on_update()
@@ -176,7 +176,7 @@ class ElectrumGui:
         self.nd.show()
 
     def create_window_for_wallet(self, wallet):
-        w = ElectrumWindow(self, wallet)
+        w = DenariiumWindow(self, wallet)
         self.windows.append(w)
         self.build_tray_menu()
         # FIXME: Remove in favour of the load_wallet hook

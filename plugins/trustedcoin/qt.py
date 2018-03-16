@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Electrum - Lightweight Bitcoin Client
+# Denariium - Lightweight Denarius Client
 # Copyright (C) 2015 Thomas Voegtlin
 #
 # Permission is hereby granted, free of charge, to any person
@@ -31,12 +31,12 @@ from decimal import Decimal
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 
-from electrum_gui.qt.util import *
-from electrum_gui.qt.qrcodewidget import QRCodeWidget
-from electrum_gui.qt.amountedit import AmountEdit
-from electrum_gui.qt.main_window import StatusBarButton
-from electrum.i18n import _
-from electrum.plugins import hook
+from denariium_gui.qt.util import *
+from denariium_gui.qt.qrcodewidget import QRCodeWidget
+from denariium_gui.qt.amountedit import AmountEdit
+from denariium_gui.qt.main_window import StatusBarButton
+from denariium.i18n import _
+from denariium.plugins import hook
 from .trustedcoin import TrustedCoinPlugin, server
 
 
@@ -136,7 +136,7 @@ class Plugin(TrustedCoinPlugin):
         logo = QLabel()
         logo.setPixmap(QPixmap(":icons/trustedcoin-status.png"))
         msg = _('This wallet is protected by TrustedCoin\'s two-factor authentication.') + '<br/>'\
-              + _("For more information, visit") + " <a href=\"https://api.trustedcoin.com/#/electrum-help\">https://api.trustedcoin.com/#/electrum-help</a>"
+              + _("For more information, visit") + " <a href=\"https://api.trustedcoin.com/#/denariium-help\">https://api.trustedcoin.com/#/denariium-help</a>"
         label = QLabel(msg)
         label.setOpenExternalLinks(1)
 
@@ -182,7 +182,7 @@ class Plugin(TrustedCoinPlugin):
         if window.pluginsdialog:
             window.pluginsdialog.close()
         wallet = window.wallet
-        uri = "bitcoin:" + wallet.billing_info['billing_address'] + "?message=TrustedCoin %d Prepaid Transactions&amount="%k + str(Decimal(v)/100000000)
+        uri = "denarius:" + wallet.billing_info['billing_address'] + "?message=TrustedCoin %d Prepaid Transactions&amount="%k + str(Decimal(v)/100000000)
         wallet.is_billing = True
         window.pay_to_URI(uri)
         window.payto_e.setFrozen(True)

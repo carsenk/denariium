@@ -11,7 +11,7 @@ else:
     raise BaseException('no name')
 
 
-home = 'C:\\electrum\\'
+home = 'C:\\denariium\\'
 
 # see https://github.com/pyinstaller/pyinstaller/issues/2005
 hiddenimports = []
@@ -27,14 +27,14 @@ binaries = [("c:/python3.5.4/libusb-1.0.dll", ".")]
 binaries += [b for b in collect_dynamic_libs('PyQt5') if 'qwindowsvista' in b[0]]
 
 datas = [
-    (home+'lib/currencies.json', 'electrum'),
-    (home+'lib/servers.json', 'electrum'),
-    (home+'lib/checkpoints.json', 'electrum'),
-    (home+'lib/servers_testnet.json', 'electrum'),
-    (home+'lib/checkpoints_testnet.json', 'electrum'),
-    (home+'lib/wordlist/english.txt', 'electrum/wordlist'),
-    (home+'lib/locale', 'electrum/locale'),
-    (home+'plugins', 'electrum_plugins'),
+    (home+'lib/currencies.json', 'denariium'),
+    (home+'lib/servers.json', 'denariium'),
+    (home+'lib/checkpoints.json', 'denariium'),
+    (home+'lib/servers_testnet.json', 'denariium'),
+    (home+'lib/checkpoints_testnet.json', 'denariium'),
+    (home+'lib/wordlist/english.txt', 'denariium/wordlist'),
+    (home+'lib/locale', 'denariium/locale'),
+    (home+'plugins', 'denariium_plugins'),
     ('C:\\Program Files (x86)\\ZBar\\bin\\', '.')
 ]
 datas += collect_data_files('trezorlib')
@@ -42,13 +42,13 @@ datas += collect_data_files('btchip')
 datas += collect_data_files('keepkeylib')
 
 # We don't put these files in to actually include them in the script but to make the Analysis method scan them for imports
-a = Analysis([home+'electrum',
+a = Analysis([home+'denariium',
               home+'gui/qt/main_window.py',
               home+'gui/text.py',
               home+'lib/util.py',
               home+'lib/wallet.py',
               home+'lib/simple_config.py',
-              home+'lib/bitcoin.py',
+              home+'lib/denarius.py',
               home+'lib/dnssec.py',
               home+'lib/commands.py',
               home+'plugins/cosigner_pool/qt.py',
@@ -86,24 +86,24 @@ exe_standalone = EXE(
     a.scripts,
     a.binaries,
     a.datas, 
-    name=os.path.join('build\\pyi.win32\\electrum', cmdline_name + ".exe"),
+    name=os.path.join('build\\pyi.win32\\denariium', cmdline_name + ".exe"),
     debug=False,
     strip=None,
     upx=False,
-    icon=home+'icons/electrum.ico',
+    icon=home+'icons/denariium.ico',
     console=False)
-    # console=True makes an annoying black box pop up, but it does make Electrum output command line commands, with this turned off no output will be given but commands can still be used
+    # console=True makes an annoying black box pop up, but it does make Denariium output command line commands, with this turned off no output will be given but commands can still be used
 
 exe_portable = EXE(
     pyz,
     a.scripts,
     a.binaries,
     a.datas + [ ('is_portable', 'README.md', 'DATA' ) ],
-    name=os.path.join('build\\pyi.win32\\electrum', cmdline_name + "-portable.exe"),
+    name=os.path.join('build\\pyi.win32\\denariium', cmdline_name + "-portable.exe"),
     debug=False,
     strip=None,
     upx=False,
-    icon=home+'icons/electrum.ico',
+    icon=home+'icons/denariium.ico',
     console=False)
 
 #####
@@ -113,11 +113,11 @@ exe_dependent = EXE(
     pyz,
     a.scripts,
     exclude_binaries=True,
-    name=os.path.join('build\\pyi.win32\\electrum', cmdline_name),
+    name=os.path.join('build\\pyi.win32\\denariium', cmdline_name),
     debug=False,
     strip=None,
     upx=False,
-    icon=home+'icons/electrum.ico',
+    icon=home+'icons/denariium.ico',
     console=False)
 
 coll = COLLECT(
@@ -128,6 +128,6 @@ coll = COLLECT(
     strip=None,
     upx=True,
     debug=False,
-    icon=home+'icons/electrum.ico',
+    icon=home+'icons/denariium.ico',
     console=False,
-    name=os.path.join('dist', 'electrum'))
+    name=os.path.join('dist', 'denariium'))

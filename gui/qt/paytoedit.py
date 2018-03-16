@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Electrum - lightweight Bitcoin client
+# Denariium - lightweight Denarius client
 # Copyright (C) 2012 thomasv@gitorious
 #
 # Permission is hereby granted, free of charge, to any person
@@ -30,7 +30,7 @@ from .qrtextedit import ScanQRTextEdit
 
 import re
 from decimal import Decimal
-from electrum import bitcoin
+from denariium import denarius
 
 from . import util
 
@@ -82,13 +82,13 @@ class PayToEdit(ScanQRTextEdit):
     def parse_output(self, x):
         try:
             address = self.parse_address(x)
-            return bitcoin.TYPE_ADDRESS, address
+            return denarius.TYPE_ADDRESS, address
         except:
             script = self.parse_script(x)
-            return bitcoin.TYPE_SCRIPT, script
+            return denarius.TYPE_SCRIPT, script
 
     def parse_script(self, x):
-        from electrum.transaction import opcodes, push_script
+        from denariium.transaction import opcodes, push_script
         script = ''
         for word in x.split():
             if word[0:3] == 'OP_':
@@ -108,7 +108,7 @@ class PayToEdit(ScanQRTextEdit):
         r = line.strip()
         m = re.match('^'+RE_ALIAS+'$', r)
         address = str(m.group(2) if m else r)
-        assert bitcoin.is_address(address)
+        assert denarius.is_address(address)
         return address
 
     def check_text(self):
@@ -122,7 +122,7 @@ class PayToEdit(ScanQRTextEdit):
         self.payto_address = None
         if len(lines) == 1:
             data = lines[0]
-            if data.startswith("bitcoin:"):
+            if data.startswith("denarius:"):
                 self.scan_f(data)
                 return
             try:
@@ -260,7 +260,7 @@ class PayToEdit(ScanQRTextEdit):
 
     def qr_input(self):
         data = super(PayToEdit,self).qr_input()
-        if data.startswith("bitcoin:"):
+        if data.startswith("denarius:"):
             self.scan_f(data)
             # TODO: update fee
 
@@ -279,7 +279,7 @@ class PayToEdit(ScanQRTextEdit):
         if not (('.' in key) and (not '<' in key) and (not ' ' in key)):
             return
         parts = key.split(sep=',')  # assuming single line
-        if parts and len(parts) > 0 and bitcoin.is_address(parts[0]):
+        if parts and len(parts) > 0 and denarius.is_address(parts[0]):
             return
         try:
             data = self.win.contacts.resolve(key)

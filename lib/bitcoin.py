@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Electrum - lightweight Bitcoin client
+# Denariium - lightweight Denarius client
 # Copyright (C) 2011 thomasv@gitorious
 #
 # Permission is hereby granted, free of charge, to any person
@@ -153,7 +153,7 @@ def int_to_hex(i, length=1):
 
 
 def var_int(i):
-    # https://en.bitcoin.it/wiki/Protocol_specification#Variable_length_integer
+    # https://en.denarius.it/wiki/Protocol_specification#Variable_length_integer
     if i<0xfd:
         return int_to_hex(i)
     elif i<=0xffff:
@@ -207,15 +207,15 @@ def is_old_seed(seed):
     try:
         # checks here are deliberately left weak for legacy reasons, see #3149
         old_mnemonic.mn_decode(words)
-        uses_electrum_words = True
+        uses_denariium_words = True
     except Exception:
-        uses_electrum_words = False
+        uses_denariium_words = False
     try:
         seed = bfh(seed)
         is_hex = (len(seed) == 16 or len(seed) == 32)
     except Exception:
         is_hex = False
-    return is_hex or (uses_electrum_words and (len(words) == 12 or len(words) == 24))
+    return is_hex or (uses_denariium_words and (len(words) == 12 or len(words) == 24))
 
 
 def seed_type(x):
@@ -388,7 +388,7 @@ def base_encode(v, base):
         result.append(chars[mod])
         long_value = div
     result.append(chars[long_value])
-    # Bitcoin does a little leading-zero-compression:
+    # Denarius does a little leading-zero-compression:
     # leading 0-bytes in the input become leading-1s
     nPad = 0
     for c in v:
@@ -568,7 +568,7 @@ def is_minikey(text):
     # permits any length of 20 or more provided the minikey is valid.
     # A valid minikey must begin with an 'S', be in base58, and when
     # suffixed with '?' have its SHA256 hash begin with a zero byte.
-    # They are widely used in Casascius physical bitcoins.
+    # They are widely used in Casascius physical denariuss.
     return (len(text) >= 20 and text[0] == 'S'
             and all(ord(c) in __b58chars for c in text)
             and sha256(text + '?')[0] == 0x00)
@@ -584,7 +584,7 @@ from ecdsa.util import string_to_number, number_to_string
 
 def msg_magic(message):
     length = bfh(var_int(len(message)))
-    return b"\x18Bitcoin Signed Message:\n" + length + message
+    return b"\x19Denarius Signed Message:\n" + length + message
 
 
 def verify_message(address, sig, message):
@@ -936,7 +936,7 @@ def xpub_from_xprv(xprv):
 
 
 def bip32_root(seed, xtype):
-    I = hmac.new(b"Bitcoin seed", seed, hashlib.sha512).digest()
+    I = hmac.new(b"Denarius seed", seed, hashlib.sha512).digest()
     master_k = I[0:32]
     master_c = I[32:]
     K, cK = get_pubkeys_from_secret(master_k)

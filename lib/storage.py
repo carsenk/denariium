@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Electrum - lightweight Bitcoin client
+# Denariium - lightweight Denarius client
 # Copyright (C) 2015 Thomas Voegtlin
 #
 # Permission is hereby granted, free of charge, to any person
@@ -36,14 +36,14 @@ import zlib
 from .util import PrintError, profiler, InvalidPassword
 from .plugins import run_hook, plugin_loaders
 from .keystore import bip44_derivation
-from . import bitcoin
+from . import denarius
 
 
 # seed_version is now used for the version of the wallet file
 
-OLD_SEED_VERSION = 4        # electrum versions < 2.0
-NEW_SEED_VERSION = 11       # electrum versions >= 2.0
-FINAL_SEED_VERSION = 16     # electrum >= 2.7 will set this to prevent
+OLD_SEED_VERSION = 4        # denariium versions < 2.0
+NEW_SEED_VERSION = 11       # denariium versions >= 2.0
+FINAL_SEED_VERSION = 16     # denariium >= 2.7 will set this to prevent
                             # old versions from overwriting new format
 
 
@@ -164,7 +164,7 @@ class WalletStorage(PrintError):
 
     def get_key(self, password):
         secret = pbkdf2.PBKDF2(password, '', iterations = 1024, macmodule = hmac, digestmodule = hashlib.sha512).read(64)
-        ec_key = bitcoin.EC_KEY(secret)
+        ec_key = denarius.EC_KEY(secret)
         return ec_key
 
     def _get_encryption_magic(self):
@@ -253,7 +253,7 @@ class WalletStorage(PrintError):
             s = bytes(s, 'utf8')
             c = zlib.compress(s)
             enc_magic = self._get_encryption_magic()
-            s = bitcoin.encrypt_message(c, self.pubkey, enc_magic)
+            s = denarius.encrypt_message(c, self.pubkey, enc_magic)
             s = s.decode('utf8')
 
         temp_path = "%s.tmp.%s" % (self.path, os.getpid())
@@ -440,7 +440,7 @@ class WalletStorage(PrintError):
                 d = {'change': []}
                 receiving_addresses = []
                 for pubkey in pubkeys:
-                    addr = bitcoin.pubkey_to_address('p2pkh', pubkey)
+                    addr = denarius.pubkey_to_address('p2pkh', pubkey)
                     receiving_addresses.append(addr)
                 d['receiving'] = receiving_addresses
                 self.put('addresses', d)
@@ -465,7 +465,7 @@ class WalletStorage(PrintError):
                 assert len(addresses) == len(pubkeys)
                 d = {}
                 for pubkey in pubkeys:
-                    addr = bitcoin.pubkey_to_address('p2pkh', pubkey)
+                    addr = denarius.pubkey_to_address('p2pkh', pubkey)
                     assert addr in addresses
                     d[addr] = {
                         'pubkey': pubkey,
@@ -515,7 +515,7 @@ class WalletStorage(PrintError):
             assert isinstance(addresses, dict)
             addresses_new = dict()
             for address, details in addresses.items():
-                if not bitcoin.is_address(address):
+                if not denarius.is_address(address):
                     remove_address(address)
                     continue
                 if details is None:
@@ -584,7 +584,7 @@ class WalletStorage(PrintError):
         if not seed_version:
             seed_version = OLD_SEED_VERSION if len(self.get('master_public_key','')) == 128 else NEW_SEED_VERSION
         if seed_version > FINAL_SEED_VERSION:
-            raise BaseException('This version of Electrum is too old to open this wallet')
+            raise BaseException('This version of Denariium is too old to open this wallet')
         if seed_version==14 and self.get('seed_type') == 'segwit':
             self.raise_unsupported_version(seed_version)
         if seed_version >=12:
@@ -605,6 +605,6 @@ class WalletStorage(PrintError):
                 # pbkdf2 was not included with the binaries, and wallet creation aborted.
                 msg += "\nIt does not contain any keys, and can safely be removed."
             else:
-                # creation was complete if electrum was run from source
-                msg += "\nPlease open this file with Electrum 1.9.8, and move your coins to a new wallet."
+                # creation was complete if denariium was run from source
+                msg += "\nPlease open this file with Denariium 1.9.8, and move your coins to a new wallet."
         raise BaseException(msg)

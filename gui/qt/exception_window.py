@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Electrum - lightweight Bitcoin client
+# Denariium - lightweight Denarius client
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -35,8 +35,8 @@ import PyQt5.QtCore as QtCore
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import *
 
-from electrum.i18n import _
-from electrum import ELECTRUM_VERSION, bitcoin, constants
+from denariium.i18n import _
+from denariium import DENARIIUM_VERSION, denarius, constants
 
 issue_template = """<h2>Traceback</h2>
 <pre>
@@ -45,13 +45,13 @@ issue_template = """<h2>Traceback</h2>
 
 <h2>Additional information</h2>
 <ul>
-  <li>Electrum version: {app_version}</li>
+  <li>Denariium version: {app_version}</li>
   <li>Operating system: {os}</li>
   <li>Wallet type: {wallet_type}</li>
   <li>Locale: {locale}</li>
 </ul>
 """
-report_server = "https://crashhub.electrum.org/crash"
+report_server = "https://crashhub.denariium.org/crash"
 
 
 class Exception_Window(QWidget):
@@ -61,14 +61,14 @@ class Exception_Window(QWidget):
         self.exc_args = (exctype, value, tb)
         self.main_window = main_window
         QWidget.__init__(self)
-        self.setWindowTitle('Electrum - ' + _('An Error Occured'))
+        self.setWindowTitle('Denariium - ' + _('An Error Occured'))
         self.setMinimumSize(600, 300)
 
         main_box = QVBoxLayout()
 
         heading = QLabel('<h2>' + _('Sorry!') + '</h2>')
         main_box.addWidget(heading)
-        main_box.addWidget(QLabel(_('Something went wrong while executing Electrum.')))
+        main_box.addWidget(QLabel(_('Something went wrong while executing Denariium.')))
 
         main_box.addWidget(QLabel(
             _('To help us diagnose and fix the problem, you can send us a bug report that contains useful debug '
@@ -107,7 +107,7 @@ class Exception_Window(QWidget):
         self.show()
 
     def send_report(self):
-        if constants.net.GENESIS[-4:] not in ["4943", "e26f"] and ".electrum.org" in report_server:
+        if constants.net.GENESIS[-4:] not in ["4943", "e26f"] and ".denariium.org" in report_server:
             # Gah! Some kind of altcoin wants to send us crash reports.
             self.main_window.show_critical(_("Please report this issue manually."))
             return
@@ -156,7 +156,7 @@ class Exception_Window(QWidget):
 
     def get_additional_info(self):
         args = {
-            "app_version": ELECTRUM_VERSION,
+            "app_version": DENARIIUM_VERSION,
             "os": platform.platform(),
             "wallet_type": "unknown",
             "locale": locale.getdefaultlocale()[0],

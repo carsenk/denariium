@@ -4,9 +4,9 @@
 build/
 dist/
 *.egg/
-/electrum.py
+/denariium.py
 contrib/pyinstaller/
-Electrum.egg-info/
+Denariium.egg-info/
 gui/qt/icons_rc.py
 locale/
 .devlocaltmp/

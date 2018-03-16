@@ -7,15 +7,15 @@ import traceback
 from decimal import Decimal
 import threading
 
-import electrum
-from electrum.bitcoin import TYPE_ADDRESS
-from electrum import WalletStorage, Wallet
-from electrum_gui.kivy.i18n import _
-from electrum.paymentrequest import InvoiceStore
-from electrum.util import profiler, InvalidPassword
-from electrum.plugins import run_hook
-from electrum.util import format_satoshis, format_satoshis_plain
-from electrum.paymentrequest import PR_UNPAID, PR_PAID, PR_UNKNOWN, PR_EXPIRED
+import denariium
+from denariium.denarius import TYPE_ADDRESS
+from denariium import WalletStorage, Wallet
+from denariium_gui.kivy.i18n import _
+from denariium.paymentrequest import InvoiceStore
+from denariium.util import profiler, InvalidPassword
+from denariium.plugins import run_hook
+from denariium.util import format_satoshis, format_satoshis_plain
+from denariium.paymentrequest import PR_UNPAID, PR_PAID, PR_UNKNOWN, PR_EXPIRED
 
 from kivy.app import App
 from kivy.core.window import Window
@@ -30,10 +30,10 @@ from kivy.metrics import inch
 from kivy.lang import Builder
 
 ## lazy imports for factory so that widgets can be used in kv
-#Factory.register('InstallWizard', module='electrum_gui.kivy.uix.dialogs.installwizard')
-#Factory.register('InfoBubble', module='electrum_gui.kivy.uix.dialogs')
-#Factory.register('OutputList', module='electrum_gui.kivy.uix.dialogs')
-#Factory.register('OutputItem', module='electrum_gui.kivy.uix.dialogs')
+#Factory.register('InstallWizard', module='denariium_gui.kivy.uix.dialogs.installwizard')
+#Factory.register('InfoBubble', module='denariium_gui.kivy.uix.dialogs')
+#Factory.register('OutputList', module='denariium_gui.kivy.uix.dialogs')
+#Factory.register('OutputItem', module='denariium_gui.kivy.uix.dialogs')
 
 from .uix.dialogs.installwizard import InstallWizard
 from .uix.dialogs import InfoBubble
@@ -48,14 +48,14 @@ util = False
 
 # register widget cache for keeping memory down timeout to forever to cache
 # the data
-Cache.register('electrum_widgets', timeout=0)
+Cache.register('denariium_widgets', timeout=0)
 
 from kivy.uix.screenmanager import Screen
 from kivy.uix.tabbedpanel import TabbedPanel
 from kivy.uix.label import Label
 from kivy.core.clipboard import Clipboard
 
-Factory.register('TabbedCarousel', module='electrum_gui.kivy.uix.screens')
+Factory.register('TabbedCarousel', module='denariium_gui.kivy.uix.screens')
 
 # Register fonts without this you won't be able to use bold/italic...
 # inside markup.
@@ -67,12 +67,12 @@ Label.register('Roboto',
                'gui/kivy/data/fonts/Roboto-Bold.ttf')
 
 
-from electrum.util import base_units
+from denariium.util import base_units
 
 
-class ElectrumWindow(App):
+class DenariiumWindow(App):
 
-    electrum_config = ObjectProperty(None)
+    denariium_config = ObjectProperty(None)
     language = StringProperty('en')
 
     # properties might be updated by the network
@@ -99,7 +99,7 @@ class ElectrumWindow(App):
         from .uix.dialogs.choice_dialog import ChoiceDialog
         protocol = 's'
         def cb2(host):
-            from electrum import constants
+            from denariium import constants
             pp = servers.get(host, constants.net.DEFAULT_PORTS)
             port = pp.get(protocol, '')
             popup.ids.host.text = host
@@ -121,22 +121,22 @@ class ElectrumWindow(App):
 
     use_rbf = BooleanProperty(False)
     def on_use_rbf(self, instance, x):
-        self.electrum_config.set_key('use_rbf', self.use_rbf, True)
+        self.denariium_config.set_key('use_rbf', self.use_rbf, True)
 
     use_change = BooleanProperty(False)
     def on_use_change(self, instance, x):
-        self.electrum_config.set_key('use_change', self.use_change, True)
+        self.denariium_config.set_key('use_change', self.use_change, True)
 
     use_unconfirmed = BooleanProperty(False)
     def on_use_unconfirmed(self, instance, x):
-        self.electrum_config.set_key('confirmed_only', not self.use_unconfirmed, True)
+        self.denariium_config.set_key('confirmed_only', not self.use_unconfirmed, True)
 
     def set_URI(self, uri):
         self.switch_to('send')
         self.send_screen.set_URI(uri)
 
     def on_new_intent(self, intent):
-        if intent.getScheme() != 'bitcoin':
+        if intent.getScheme() != 'denarius':
             return
         uri = intent.getDataString()
         self.set_URI(uri)
@@ -158,11 +158,11 @@ class ElectrumWindow(App):
         self._trigger_update_history()
 
     def _get_bu(self):
-        return self.electrum_config.get('base_unit', 'mBTC')
+        return self.denariium_config.get('base_unit', 'mDNR')
 
     def _set_bu(self, value):
         assert value in base_units.keys()
-        self.electrum_config.set_key('base_unit', value, True)
+        self.denariium_config.set_key('base_unit', value, True)
         self._trigger_update_status()
         self._trigger_update_history()
 
@@ -247,8 +247,8 @@ class ElectrumWindow(App):
 
         App.__init__(self)#, **kwargs)
 
-        title = _('Electrum App')
-        self.electrum_config = config = kwargs.get('config', None)
+        title = _('Denariium App')
+        self.denariium_config = config = kwargs.get('config', None)
         self.language = config.get('language', 'en')
         self.network = network = kwargs.get('network', None)
         if self.network:
@@ -277,7 +277,7 @@ class ElectrumWindow(App):
         # cached dialogs
         self._settings_dialog = None
         self._password_dialog = None
-        self.fee_status = self.electrum_config.get_fee_status()
+        self.fee_status = self.denariium_config.get_fee_status()
 
     def wallet_name(self):
         return os.path.basename(self.wallet.storage.path) if self.wallet else ' '
@@ -302,17 +302,17 @@ class ElectrumWindow(App):
             self.send_screen.do_clear()
 
     def on_qr(self, data):
-        from electrum.bitcoin import base_decode, is_address
+        from denariium.denarius import base_decode, is_address
         data = data.strip()
         if is_address(data):
             self.set_URI(data)
             return
-        if data.startswith('bitcoin:'):
+        if data.startswith('denarius:'):
             self.set_URI(data)
             return
         # try to decode transaction
-        from electrum.transaction import Transaction
-        from electrum.util import bh2u
+        from denariium.transaction import Transaction
+        from denariium.util import bh2u
         try:
             text = bh2u(base_decode(data, None, base=43))
             tx = Transaction(text)
@@ -349,7 +349,7 @@ class ElectrumWindow(App):
         self.receive_screen.screen.address = addr
 
     def show_pr_details(self, req, status, is_invoice):
-        from electrum.util import format_time
+        from denariium.util import format_time
         requestor = req.get('requestor')
         exp = req.get('exp')
         memo = req.get('memo')
@@ -371,7 +371,7 @@ class ElectrumWindow(App):
         popup.open()
 
     def show_addr_details(self, req, status):
-        from electrum.util import format_time
+        from denariium.util import format_time
         fund = req.get('fund')
         isaddr = 'y'
         popup = Builder.load_file('gui/kivy/uix/ui_screens/invoice.kv')
@@ -394,7 +394,7 @@ class ElectrumWindow(App):
         from jnius import autoclass, cast
         from android import activity
         PythonActivity = autoclass('org.kivy.android.PythonActivity')
-        SimpleScannerActivity = autoclass("org.electrum.qr.SimpleScannerActivity")
+        SimpleScannerActivity = autoclass("org.denariium.qr.SimpleScannerActivity")
         Intent = autoclass('android.content.Intent')
         intent = Intent(PythonActivity.mActivity, SimpleScannerActivity)
 
@@ -445,14 +445,14 @@ class ElectrumWindow(App):
         #win.softinput_mode = 'below_target'
         self.on_size(win, win.size)
         self.init_ui()
-        self.load_wallet_by_name(self.electrum_config.get_wallet_path())
+        self.load_wallet_by_name(self.denariium_config.get_wallet_path())
         # init plugins
         run_hook('init_kivy', self)
         # fiat currency
         self.fiat_unit = self.fx.ccy if self.fx.is_enabled() else ''
         # default tab
         self.switch_to('history')
-        # bind intent for bitcoin: URI scheme
+        # bind intent for denarius: URI scheme
         if platform == 'android':
             from android import activity
             from jnius import autoclass
@@ -468,7 +468,7 @@ class ElectrumWindow(App):
             self.network.register_callback(self.on_quotes, ['on_quotes'])
             self.network.register_callback(self.on_history, ['on_history'])
         # URI passed in config
-        uri = self.electrum_config.get('url')
+        uri = self.denariium_config.get('url')
         if uri:
             self.set_URI(uri)
 
@@ -496,9 +496,9 @@ class ElectrumWindow(App):
                 self.load_wallet(wallet)
                 self.on_resume()
         else:
-            Logger.debug('Electrum: Wallet not found. Launching install wizard')
+            Logger.debug('Denariium: Wallet not found. Launching install wizard')
             storage = WalletStorage(path)
-            wizard = Factory.InstallWizard(self.electrum_config, storage)
+            wizard = Factory.InstallWizard(self.denariium_config, storage)
             wizard.bind(on_wizard_complete=self.on_wizard_complete)
             action = wizard.storage.get_action()
             wizard.run(action)
@@ -560,7 +560,7 @@ class ElectrumWindow(App):
 
     @profiler
     def init_ui(self):
-        ''' Initialize The Ux part of electrum. This function performs the basic
+        ''' Initialize The Ux part of denariium. This function performs the basic
         tasks of setting up the ui.
         '''
         #from weakref import ref
@@ -571,13 +571,13 @@ class ElectrumWindow(App):
 
         #setup lazy imports for mainscreen
         Factory.register('AnimatedPopup',
-                         module='electrum_gui.kivy.uix.dialogs')
+                         module='denariium_gui.kivy.uix.dialogs')
         Factory.register('QRCodeWidget',
-                         module='electrum_gui.kivy.uix.qrcodewidget')
+                         module='denariium_gui.kivy.uix.qrcodewidget')
 
         # preload widgets. Remove this if you want to load the widgets on demand
-        #Cache.append('electrum_widgets', 'AnimatedPopup', Factory.AnimatedPopup())
-        #Cache.append('electrum_widgets', 'QRCodeWidget', Factory.QRCodeWidget())
+        #Cache.append('denariium_widgets', 'AnimatedPopup', Factory.AnimatedPopup())
+        #Cache.append('denariium_widgets', 'QRCodeWidget', Factory.QRCodeWidget())
 
         # load and focus the ui
         self.root.manager = self.root.ids['manager']
@@ -589,7 +589,7 @@ class ElectrumWindow(App):
         self.receive_screen = None
         self.requests_screen = None
         self.address_screen = None
-        self.icon = "icons/electrum.png"
+        self.icon = "icons/denariium.png"
         self.tabs = self.root.ids['tabs']
 
     def update_interfaces(self, dt):
@@ -652,10 +652,10 @@ class ElectrumWindow(App):
         self.fiat_balance = self.fx.format_amount(c+u+x) + ' [size=22dp]%s[/size]'% self.fx.ccy
 
     def get_max_amount(self):
-        inputs = self.wallet.get_spendable_coins(None, self.electrum_config)
+        inputs = self.wallet.get_spendable_coins(None, self.denariium_config)
         addr = str(self.send_screen.screen.address) or self.wallet.dummy_address()
         outputs = [(TYPE_ADDRESS, addr, '!')]
-        tx = self.wallet.make_unsigned_transaction(inputs, outputs, self.electrum_config)
+        tx = self.wallet.make_unsigned_transaction(inputs, outputs, self.denariium_config)
         amount = tx.output_value()
         return format_satoshis_plain(amount, self.decimal_point())
 
@@ -678,8 +678,8 @@ class ElectrumWindow(App):
                 from plyer import notification
             icon = (os.path.dirname(os.path.realpath(__file__))
                     + '/../../' + self.icon)
-            notification.notify('Electrum', message,
-                            app_icon=icon, app_name='Electrum')
+            notification.notify('Denariium', message,
+                            app_icon=icon, app_name='Denariium')
         except ImportError:
             Logger.Error('Notification: needs plyer; `sudo pip install plyer`')
 
@@ -850,7 +850,7 @@ class ElectrumWindow(App):
 
     def requests_dialog(self, screen):
         from .uix.dialogs.requests import RequestsDialog
-        if len(self.wallet.get_sorted_requests(self.electrum_config)) == 0:
+        if len(self.wallet.get_sorted_requests(self.denariium_config)) == 0:
             self.show_info(_('No saved requests.'))
             return
         popup = RequestsDialog(self, screen, None)
@@ -866,12 +866,12 @@ class ElectrumWindow(App):
     def fee_dialog(self, label, dt):
         from .uix.dialogs.fee_dialog import FeeDialog
         def cb():
-            self.fee_status = self.electrum_config.get_fee_status()
-        fee_dialog = FeeDialog(self, self.electrum_config, cb)
+            self.fee_status = self.denariium_config.get_fee_status()
+        fee_dialog = FeeDialog(self, self.denariium_config, cb)
         fee_dialog.open()
 
     def on_fee(self, event, *arg):
-        self.fee_status = self.electrum_config.get_fee_status()
+        self.fee_status = self.denariium_config.get_fee_status()
 
     def protected(self, msg, f, args):
         if self.wallet.has_password():

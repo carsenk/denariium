@@ -3,21 +3,21 @@ from kivy.factory import Factory
 from kivy.properties import ObjectProperty
 from kivy.lang import Builder
 
-from electrum.util import base_units
-from electrum.i18n import languages
-from electrum_gui.kivy.i18n import _
-from electrum.plugins import run_hook
-from electrum import coinchooser
+from denariium.util import base_units
+from denariium.i18n import languages
+from denariium_gui.kivy.i18n import _
+from denariium.plugins import run_hook
+from denariium import coinchooser
 
 from .choice_dialog import ChoiceDialog
 
 Builder.load_string('''
 #:import partial functools.partial
-#:import _ electrum_gui.kivy.i18n._
+#:import _ denariium_gui.kivy.i18n._
 
 <SettingsDialog@Popup>
     id: settings
-    title: _('Electrum Settings')
+    title: _('Denariium Settings')
     disable_pin: False
     use_encryption: False
     BoxLayout:
@@ -45,7 +45,7 @@ Builder.load_string('''
                 SettingsItem:
                     bu: app.base_unit
                     title: _('Denomination') + ': ' + self.bu
-                    description: _("Base unit for Bitcoin amounts.")
+                    description: _("Base unit for Denarius amounts.")
                     action: partial(root.unit_dialog, self)
                 CardSeparator
                 SettingsItem:
@@ -100,7 +100,7 @@ class SettingsDialog(Factory.Popup):
     def __init__(self, app):
         self.app = app
         self.plugins = self.app.plugins
-        self.config = self.app.electrum_config
+        self.config = self.app.denariium_config
         Factory.Popup.__init__(self)
         layout = self.ids.scrollviewlayout
         layout.bind(minimum_height=layout.setter('height'))
@@ -141,7 +141,7 @@ class SettingsDialog(Factory.Popup):
         self._unit_dialog.open()
 
     def coinselect_status(self):
-        return coinchooser.get_name(self.app.electrum_config)
+        return coinchooser.get_name(self.app.denariium_config)
 
     def coinselect_dialog(self, item, dt):
         if self._coinselect_dialog is None:

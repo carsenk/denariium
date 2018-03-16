@@ -18,7 +18,7 @@ with open('contrib/requirements/requirements-hw.txt') as f:
 version = imp.load_source('version', 'lib/version.py')
 
 if sys.version_info[:3] < (3, 4, 0):
-    sys.exit("Error: Electrum requires Python version >= 3.4.0...")
+    sys.exit("Error: Denariium requires Python version >= 3.4.0...")
 
 data_files = []
 
@@ -34,39 +34,39 @@ if platform.system() in ['Linux', 'FreeBSD', 'DragonFly']:
         else:
             usr_share = os.path.expanduser('~/.local/share')
     data_files += [
-        (os.path.join(usr_share, 'applications/'), ['electrum.desktop']),
-        (os.path.join(usr_share, 'pixmaps/'), ['icons/electrum.png'])
+        (os.path.join(usr_share, 'applications/'), ['denariium.desktop']),
+        (os.path.join(usr_share, 'pixmaps/'), ['icons/denariium.png'])
     ]
 
 setup(
-    name="Electrum",
-    version=version.ELECTRUM_VERSION,
+    name="Denariium",
+    version=version.DENARIIUM_VERSION,
     install_requires=requirements,
     packages=[
-        'electrum',
-        'electrum_gui',
-        'electrum_gui.qt',
-        'electrum_plugins',
-        'electrum_plugins.audio_modem',
-        'electrum_plugins.cosigner_pool',
-        'electrum_plugins.email_requests',
-        'electrum_plugins.greenaddress_instant',
-        'electrum_plugins.hw_wallet',
-        'electrum_plugins.keepkey',
-        'electrum_plugins.labels',
-        'electrum_plugins.ledger',
-        'electrum_plugins.trezor',
-        'electrum_plugins.digitalbitbox',
-        'electrum_plugins.trustedcoin',
-        'electrum_plugins.virtualkeyboard',
+        'denariium',
+        'denariium_gui',
+        'denariium_gui.qt',
+        'denariium_plugins',
+        'denariium_plugins.audio_modem',
+        'denariium_plugins.cosigner_pool',
+        'denariium_plugins.email_requests',
+        'denariium_plugins.greenaddress_instant',
+        'denariium_plugins.hw_wallet',
+        'denariium_plugins.keepkey',
+        'denariium_plugins.labels',
+        'denariium_plugins.ledger',
+        'denariium_plugins.trezor',
+        'denariium_plugins.digitalbitbox',
+        'denariium_plugins.trustedcoin',
+        'denariium_plugins.virtualkeyboard',
     ],
     package_dir={
-        'electrum': 'lib',
-        'electrum_gui': 'gui',
-        'electrum_plugins': 'plugins',
+        'denariium': 'lib',
+        'denariium_gui': 'gui',
+        'denariium_plugins': 'plugins',
     },
     package_data={
-        'electrum': [
+        'denariium': [
             'servers.json',
             'servers_testnet.json',
             'currencies.json',
@@ -74,20 +74,20 @@ setup(
             'checkpoints_testnet.json',
             'www/index.html',
             'wordlist/*.txt',
-            'locale/*/LC_MESSAGES/electrum.mo',
+            'locale/*/LC_MESSAGES/denariium.mo',
         ]
     },
-    scripts=['electrum'],
+    scripts=['denariium'],
     data_files=data_files,
-    description="Lightweight Bitcoin Wallet",
+    description="Lightweight Denarius Wallet",
     author="Thomas Voegtlin",
-    author_email="thomasv@electrum.org",
+    author_email="thomasv@denariium.org",
     license="MIT Licence",
-    url="https://electrum.org",
-    long_description="""Lightweight Bitcoin Wallet"""
+    url="https://denariium.org",
+    long_description="""Lightweight Denarius Wallet"""
 )
 
-# Optional modules (not required to run Electrum)
+# Optional modules (not required to run Denariium)
 import pip
 opt_modules = requirements_hw + ['pycryptodomex']
 [ pip.main(['install', m]) for m in opt_modules ]

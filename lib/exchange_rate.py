@@ -10,7 +10,7 @@ import csv
 import decimal
 from decimal import Decimal
 
-from .bitcoin import COIN
+from .denarius import COIN
 from .i18n import _
 from .util import PrintError, ThreadJob
 
@@ -35,12 +35,12 @@ class ExchangeBase(PrintError):
     def get_json(self, site, get_string):
         # APIs must have https
         url = ''.join(['https://', site, get_string])
-        response = requests.request('GET', url, headers={'User-Agent' : 'Electrum'}, timeout=10)
+        response = requests.request('GET', url, headers={'User-Agent' : 'Denariium'}, timeout=10)
         return response.json()
 
     def get_csv(self, site, get_string):
         url = ''.join(['https://', site, get_string])
-        response = requests.request('GET', url, headers={'User-Agent' : 'Electrum'})
+        response = requests.request('GET', url, headers={'User-Agent' : 'Denariium'})
         reader = csv.DictReader(response.content.decode().split('\n'))
         return list(reader)
 
@@ -115,11 +115,11 @@ class ExchangeBase(PrintError):
         return sorted([str(a) for (a, b) in rates.items() if b is not None and len(a)==3])
 
 
-class BitcoinAverage(ExchangeBase):
+class DenariusAverage(ExchangeBase):
 
     def get_rates(self, ccy):
-        json = self.get_json('apiv2.bitcoinaverage.com', '/indices/global/ticker/short')
-        return dict([(r.replace("BTC", ""), Decimal(json[r]['last']))
+        json = self.get_json('apiv2.denariusaverage.com', '/indices/global/ticker/short')
+        return dict([(r.replace("DNR", ""), Decimal(json[r]['last']))
                      for r in json if r != 'timestamp'])
 
     def history_ccys(self):
@@ -128,36 +128,36 @@ class BitcoinAverage(ExchangeBase):
                 'ZAR']
 
     def request_history(self, ccy):
-        history = self.get_csv('apiv2.bitcoinaverage.com',
-                               "/indices/global/history/BTC%s?period=alltime&format=csv" % ccy)
+        history = self.get_csv('apiv2.denariusaverage.com',
+                               "/indices/global/history/DNR%s?period=alltime&format=csv" % ccy)
         return dict([(h['DateTime'][:10], h['Average'])
                      for h in history])
 
 
-class Bitcointoyou(ExchangeBase):
+class Denariustoyou(ExchangeBase):
 
     def get_rates(self, ccy):
-        json = self.get_json('bitcointoyou.com', "/API/ticker.aspx")
+        json = self.get_json('denariustoyou.com', "/API/ticker.aspx")
         return {'BRL': Decimal(json['ticker']['last'])}
 
     def history_ccys(self):
         return ['BRL']
 
 
-class BitcoinVenezuela(ExchangeBase):
+class DenariusVenezuela(ExchangeBase):
 
     def get_rates(self, ccy):
-        json = self.get_json('api.bitcoinvenezuela.com', '/')
-        rates = [(r, json['BTC'][r]) for r in json['BTC']
-                 if json['BTC'][r] is not None]  # Giving NULL for LTC
+        json = self.get_json('api.denariusvenezuela.com', '/')
+        rates = [(r, json['DNR'][r]) for r in json['DNR']
+                 if json['DNR'][r] is not None]  # Giving NULL for LTC
         return dict(rates)
 
     def history_ccys(self):
         return ['ARS', 'EUR', 'USD', 'VEF']
 
     def request_history(self, ccy):
-        return self.get_json('api.bitcoinvenezuela.com',
-                             "/historical/index.php?coin=BTC")[ccy +'_BTC']
+        return self.get_json('api.denariusvenezuela.com',
+                             "/historical/index.php?coin=DNR")[ccy +'_BTC']
 
 
 class Bitbank(ExchangeBase):
@@ -304,15 +304,15 @@ class Kraken(ExchangeBase):
                      for k, v in json['result'].items())
 
 
-class LocalBitcoins(ExchangeBase):
+class LocalDenariuss(ExchangeBase):
 
     def get_rates(self, ccy):
-        json = self.get_json('localbitcoins.com',
-                             '/bitcoinaverage/ticker-all-currencies/')
+        json = self.get_json('localdenariuss.com',
+                             '/denariusaverage/ticker-all-currencies/')
         return dict([(r, Decimal(json[r]['rates']['last'])) for r in json])
 
 
-class MercadoBitcoin(ExchangeBase):
+class MercadoDenarius(ExchangeBase):
 
     def get_rates(self, ccy):
         json = self.get_json('api.bitvalor.com', '/v1/ticker.json')
@@ -488,7 +488,7 @@ class FxThread(ThreadJob):
         return self.config.get("currency", "EUR")
 
     def config_exchange(self):
-        return self.config.get('use_exchange', 'BitcoinAverage')
+        return self.config.get('use_exchange', 'DenariusAverage')
 
     def show_history(self):
         return self.is_enabled() and self.get_history_config() and self.ccy in self.exchange.history_ccys()
@@ -500,7 +500,7 @@ class FxThread(ThreadJob):
         self.on_quotes()
 
     def set_exchange(self, name):
-        class_ = globals().get(name, BitcoinAverage)
+        class_ = globals().get(name, DenariusAverage)
         self.print_error("using exchange", name)
         if self.config_exchange() != name:
             self.config.set_key('use_exchange', name, True)
@@ -567,6 +567,6 @@ class FxThread(ThreadJob):
         return self.fiat_value(satoshis, self.history_rate(d_t))
 
     def timestamp_rate(self, timestamp):
-        from electrum.util import timestamp_to_datetime
+        from denariium.util import timestamp_to_datetime
         date = timestamp_to_datetime(timestamp)
         return self.history_rate(date)

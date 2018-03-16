@@ -1,4 +1,4 @@
-# Electrum - lightweight Bitcoin client
+# Denariium - lightweight Denarius client
 # Copyright (C) 2015 Thomas Voegtlin
 #
 # Permission is hereby granted, free of charge, to any person
@@ -46,7 +46,7 @@ from .i18n import _
 from .util import (NotEnoughFunds, PrintError, UserCancelled, profiler,
                    format_satoshis, NoDynamicFeeEstimates, TimeoutException)
 
-from .bitcoin import *
+from .denarius import *
 from .version import *
 from .keystore import load_keystore, Hardware_KeyStore
 from .storage import multisig_type, STO_EV_PLAINTEXT, STO_EV_USER_PW, STO_EV_XPUB_PW
@@ -54,7 +54,7 @@ from .storage import multisig_type, STO_EV_PLAINTEXT, STO_EV_USER_PW, STO_EV_XPU
 from . import transaction
 from .transaction import Transaction
 from .plugins import run_hook
-from . import bitcoin
+from . import denarius
 from . import coinchooser
 from .synchronizer import Synchronizer
 from .verifier import SPV
@@ -89,11 +89,11 @@ def dust_threshold(network):
 
 def append_utxos_to_inputs(inputs, network, pubkey, txin_type, imax):
     if txin_type != 'p2pk':
-        address = bitcoin.pubkey_to_address(txin_type, pubkey)
-        sh = bitcoin.address_to_scripthash(address)
+        address = denarius.pubkey_to_address(txin_type, pubkey)
+        sh = denarius.address_to_scripthash(address)
     else:
-        script = bitcoin.public_key_to_p2pk_script(pubkey)
-        sh = bitcoin.script_to_scripthash(script)
+        script = denarius.public_key_to_p2pk_script(pubkey)
+        sh = denarius.script_to_scripthash(script)
         address = '(pubkey)'
     u = network.synchronous_get(('blockchain.scripthash.listunspent', [sh]))
     for item in u:
@@ -112,13 +112,13 @@ def append_utxos_to_inputs(inputs, network, pubkey, txin_type, imax):
 def sweep_preparations(privkeys, network, imax=100):
 
     def find_utxos_for_privkey(txin_type, privkey, compressed):
-        pubkey = bitcoin.public_key_from_private_key(privkey, compressed)
+        pubkey = denarius.public_key_from_private_key(privkey, compressed)
         append_utxos_to_inputs(inputs, network, pubkey, txin_type, imax)
         keypairs[pubkey] = privkey, compressed
     inputs = []
     keypairs = {}
     for sec in privkeys:
-        txin_type, privkey, compressed = bitcoin.deserialize_privkey(sec)
+        txin_type, privkey, compressed = denarius.deserialize_privkey(sec)
         find_utxos_for_privkey(txin_type, privkey, compressed)
         # do other lookups to increase support coverage
         if is_minikey(sec):
@@ -179,7 +179,7 @@ class Abstract_Wallet(PrintError):
     max_change_outputs = 3
 
     def __init__(self, storage):
-        self.electrum_version = ELECTRUM_VERSION
+        self.denariium_version = DENARIIUM_VERSION
         self.storage = storage
         self.network = None
         # verifier (SPV) and synchronizer are started in start_threads
@@ -334,8 +334,8 @@ class Abstract_Wallet(PrintError):
     def test_addresses_sanity(self):
         addrs = self.get_receiving_addresses()
         if len(addrs) > 0:
-            if not bitcoin.is_address(addrs[0]):
-                raise Exception('The addresses in this wallet are not bitcoin addresses.')
+            if not denarius.is_address(addrs[0]):
+                raise Exception('The addresses in this wallet are not denarius addresses.')
 
     def synchronize(self):
         pass
@@ -416,7 +416,7 @@ class Abstract_Wallet(PrintError):
         pk, compressed = self.keystore.get_private_key(index, password)
         txin_type = self.get_txin_type(address)
         redeem_script = self.get_redeem_script(address)
-        serialized_privkey = bitcoin.serialize_privkey(pk, compressed, txin_type)
+        serialized_privkey = denarius.serialize_privkey(pk, compressed, txin_type)
         return serialized_privkey, redeem_script
 
     def get_public_keys(self, address):
@@ -663,7 +663,7 @@ class Abstract_Wallet(PrintError):
         received, sent = self.get_addr_io(address)
         return sum([v for height, v, is_cb in received.values()])
 
-    # return the balance of a bitcoin address: confirmed and matured, unconfirmed, unmatured
+    # return the balance of a denarius address: confirmed and matured, unconfirmed, unmatured
     def get_addr_balance(self, address):
         received, sent = self.get_addr_io(address)
         c = u = x = 0
@@ -754,7 +754,7 @@ class Abstract_Wallet(PrintError):
         if _type == TYPE_ADDRESS:
             addr = x
         elif _type == TYPE_PUBKEY:
-            addr = bitcoin.public_key_to_p2pkh(bfh(x))
+            addr = denarius.public_key_to_p2pkh(bfh(x))
         else:
             addr = None
         return addr
@@ -1166,7 +1166,7 @@ class Abstract_Wallet(PrintError):
             _type, data, value = o
             if _type == TYPE_ADDRESS:
                 if not is_address(data):
-                    raise BaseException("Invalid bitcoin address:" + data)
+                    raise BaseException("Invalid denarius address:" + data)
             if value == '!':
                 if i_max is not None:
                     raise BaseException("More than one output set to spend max")
@@ -1515,7 +1515,7 @@ class Abstract_Wallet(PrintError):
         if not r:
             return
         out = copy.copy(r)
-        out['URI'] = 'bitcoin:' + addr + '?amount=' + format_satoshis(out.get('amount'))
+        out['URI'] = 'denarius:' + addr + '?amount=' + format_satoshis(out.get('amount'))
         status, conf = self.get_request_status(addr)
         out['status'] = status
         if conf is not None:
@@ -1882,7 +1882,7 @@ class Imported_Wallet(Simple_Wallet):
         return []
 
     def import_address(self, address):
-        if not bitcoin.is_address(address):
+        if not denarius.is_address(address):
             return ''
         if address in self.addresses:
             return ''
@@ -1948,11 +1948,11 @@ class Imported_Wallet(Simple_Wallet):
         if txin_type in ['p2pkh', 'p2wpkh', 'p2wpkh-p2sh']:
             if redeem_script is not None:
                 raise BaseException('Cannot use redeem script with', txin_type)
-            addr = bitcoin.pubkey_to_address(txin_type, pubkey)
+            addr = denarius.pubkey_to_address(txin_type, pubkey)
         elif txin_type in ['p2sh', 'p2wsh', 'p2wsh-p2sh']:
             if redeem_script is None:
                 raise BaseException('Redeem script required for', txin_type)
-            addr = bitcoin.redeem_script_to_address(txin_type, redeem_script)
+            addr = denarius.redeem_script_to_address(txin_type, redeem_script)
         else:
             raise NotImplementedError(txin_type)
         self.addresses[addr] = {'type':txin_type, 'pubkey':pubkey, 'redeem_script':redeem_script}
@@ -2135,7 +2135,7 @@ class Simple_Deterministic_Wallet(Simple_Wallet, Deterministic_Wallet):
     def load_keystore(self):
         self.keystore = load_keystore(self.storage, 'keystore')
         try:
-            xtype = bitcoin.xpub_type(self.keystore.xpub)
+            xtype = denarius.xpub_type(self.keystore.xpub)
         except:
             xtype = 'standard'
         self.txin_type = 'p2pkh' if xtype == 'standard' else xtype
@@ -2165,7 +2165,7 @@ class Standard_Wallet(Simple_Deterministic_Wallet):
     wallet_type = 'standard'
 
     def pubkeys_to_address(self, pubkey):
-        return bitcoin.pubkey_to_address(self.txin_type, pubkey)
+        return denarius.pubkey_to_address(self.txin_type, pubkey)
 
 
 class Multisig_Wallet(Deterministic_Wallet):
@@ -2186,7 +2186,7 @@ class Multisig_Wallet(Deterministic_Wallet):
 
     def pubkeys_to_address(self, pubkeys):
         redeem_script = self.pubkeys_to_redeem_script(pubkeys)
-        return bitcoin.redeem_script_to_address(self.txin_type, redeem_script)
+        return denarius.redeem_script_to_address(self.txin_type, redeem_script)
 
     def pubkeys_to_redeem_script(self, pubkeys):
         return transaction.multisig_script(sorted(pubkeys), self.m)
@@ -2205,7 +2205,7 @@ class Multisig_Wallet(Deterministic_Wallet):
             name = 'x%d/'%(i+1)
             self.keystores[name] = load_keystore(self.storage, name)
         self.keystore = self.keystores['x1/']
-        xtype = bitcoin.xpub_type(self.keystore.xpub)
+        xtype = denarius.xpub_type(self.keystore.xpub)
         self.txin_type = 'p2sh' if xtype == 'standard' else xtype
 
     def save_keystore(self):
@@ -2290,7 +2290,7 @@ class Wallet(object):
         WalletClass = Wallet.wallet_class(wallet_type)
         wallet = WalletClass(storage)
         # Convert hardware wallets restored with older versions of
-        # Electrum to BIP44 wallets.  A hardware wallet does not have
+        # Denariium to BIP44 wallets.  A hardware wallet does not have
         # a seed and plugins do not need to handle having one.
         rwc = getattr(wallet, 'restore_wallet_class', None)
         if rwc and storage.get('seed', ''):

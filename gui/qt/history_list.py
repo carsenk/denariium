@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Electrum - lightweight Bitcoin client
+# Denariium - lightweight Denarius client
 # Copyright (C) 2015 Thomas Voegtlin
 #
 # Permission is hereby granted, free of charge, to any person
@@ -26,13 +26,13 @@
 import webbrowser
 import datetime
 
-from electrum.wallet import AddTransactionException, TX_HEIGHT_LOCAL
+from denariium.wallet import AddTransactionException, TX_HEIGHT_LOCAL
 from .util import *
-from electrum.i18n import _
-from electrum.util import block_explorer_URL, profiler
+from denariium.i18n import _
+from denariium.util import block_explorer_URL, profiler
 
 try:
-    from electrum.plot import plot_history, NothingToPlotException
+    from denariium.plot import plot_history, NothingToPlotException
 except:
     plot_history = None
 
@@ -381,7 +381,7 @@ class HistoryList(MyTreeWidget, AcceptFileDragDrop):
         d = WindowModalDialog(self, _('Export History'))
         d.setMinimumSize(400, 200)
         vbox = QVBoxLayout(d)
-        defaultname = os.path.expanduser('~/electrum-history.csv')
+        defaultname = os.path.expanduser('~/denariium-history.csv')
         select_msg = _('Select file to export your wallet transactions to')
         hbox, filename_e, csv_button = filename_field(self, self.config, defaultname, select_msg)
         vbox.addLayout(hbox)
@@ -398,7 +398,7 @@ class HistoryList(MyTreeWidget, AcceptFileDragDrop):
         try:
             self.do_export_history(self.wallet, filename, csv_button.isChecked())
         except (IOError, os.error) as reason:
-            export_error_label = _("Electrum was unable to produce a transaction export.")
+            export_error_label = _("Denariium was unable to produce a transaction export.")
             self.parent.show_critical(export_error_label + "\n" + str(reason), title=_("Unable to export history"))
             return
         self.parent.show_message(_("Your wallet history has been successfully exported."))
@@ -419,5 +419,5 @@ class HistoryList(MyTreeWidget, AcceptFileDragDrop):
                 for line in lines:
                     transaction.writerow(line)
             else:
-                from electrum.util import json_encode
+                from denariium.util import json_encode
                 f.write(json_encode(history))

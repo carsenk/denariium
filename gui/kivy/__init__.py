@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Electrum - lightweight Bitcoin client
+# Denariium - lightweight Denarius client
 # Copyright (C) 2012 thomasv@gitorious
 #
 # Permission is hereby granted, free of charge, to any person
@@ -43,19 +43,19 @@ from kivy.logger import Logger
 
 
 
-class ElectrumGui:
+class DenariiumGui:
 
     def __init__(self, config, daemon, plugins):
-        Logger.debug('ElectrumGUI: initialising')
+        Logger.debug('DenariiumGUI: initialising')
         self.daemon = daemon
         self.network = daemon.network
         self.config = config
         self.plugins = plugins
 
     def main(self):
-        from .main_window import ElectrumWindow
+        from .main_window import DenariiumWindow
         self.config.open_last_wallet()
-        w = ElectrumWindow(config=self.config,
+        w = DenariiumWindow(config=self.config,
                            network=self.network,
                            plugins = self.plugins,
                            gui_object=self)

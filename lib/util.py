@@ -1,4 +1,4 @@
-# Electrum - lightweight Bitcoin client
+# Denariium - lightweight Denarius client
 # Copyright (C) 2011 Thomas Voegtlin
 #
 # Permission is hereby granted, free of charge, to any person
@@ -40,7 +40,7 @@ def inv_dict(d):
     return {v: k for k, v in d.items()}
 
 
-base_units = {'BTC':8, 'mBTC':5, 'uBTC':2}
+base_units = {'DNR':8, 'mDNR':5, 'uBTC':2}
 
 def normalize_version(v):
     return [int(x) for x in re.sub(r'(\.0+)*$','', v).split(".")]
@@ -100,7 +100,7 @@ class Satoshis(object):
         return 'Satoshis(%d)'%self.value
 
     def __str__(self):
-        return format_satoshis(self.value) + " BTC"
+        return format_satoshis(self.value) + " DNR"
 
 class Fiat(object):
     def __new__(cls, value, ccy):
@@ -299,7 +299,7 @@ def android_data_dir():
     return PythonActivity.mActivity.getFilesDir().getPath() + '/data'
 
 def android_headers_dir():
-    d = android_ext_dir() + '/org.electrum.electrum'
+    d = android_ext_dir() + '/org.denariium.denariium'
     if not os.path.exists(d):
         os.mkdir(d)
     return d
@@ -308,16 +308,16 @@ def android_check_data_dir():
     """ if needed, move old directory to sandbox """
     ext_dir = android_ext_dir()
     data_dir = android_data_dir()
-    old_electrum_dir = ext_dir + '/electrum'
-    if not os.path.exists(data_dir) and os.path.exists(old_electrum_dir):
+    old_denariium_dir = ext_dir + '/denariium'
+    if not os.path.exists(data_dir) and os.path.exists(old_denariium_dir):
         import shutil
         new_headers_path = android_headers_dir() + '/blockchain_headers'
-        old_headers_path = old_electrum_dir + '/blockchain_headers'
+        old_headers_path = old_denariium_dir + '/blockchain_headers'
         if not os.path.exists(new_headers_path) and os.path.exists(old_headers_path):
             print_error("Moving headers file to", new_headers_path)
             shutil.move(old_headers_path, new_headers_path)
         print_error("Moving data to", data_dir)
-        shutil.move(old_electrum_dir, data_dir)
+        shutil.move(old_denariium_dir, data_dir)
     return data_dir
 
 def get_headers_dir(config):
@@ -389,11 +389,11 @@ def user_dir():
     if 'ANDROID_DATA' in os.environ:
         return android_check_data_dir()
     elif os.name == 'posix':
-        return os.path.join(os.environ["HOME"], ".electrum")
+        return os.path.join(os.environ["HOME"], ".denariium")
     elif "APPDATA" in os.environ:
-        return os.path.join(os.environ["APPDATA"], "Electrum")
+        return os.path.join(os.environ["APPDATA"], "Denariium")
     elif "LOCALAPPDATA" in os.environ:
-        return os.path.join(os.environ["LOCALAPPDATA"], "Electrum")
+        return os.path.join(os.environ["LOCALAPPDATA"], "Denariium")
     else:
         #raise Exception("No home directory found in environment variables.")
         return
@@ -492,38 +492,18 @@ def time_difference(distance_in_time, include_seconds):
         return "over %d years" % (round(distance_in_minutes / 525600))
 
 mainnet_block_explorers = {
-    'Biteasy.com': ('https://www.biteasy.com/blockchain/',
-                        {'tx': 'transactions/', 'addr': 'addresses/'}),
-    'Bitflyer.jp': ('https://chainflyer.bitflyer.jp/',
-                        {'tx': 'Transaction/', 'addr': 'Address/'}),
-    'Blockchain.info': ('https://blockchain.info/',
+    'DenariusExplorer.org': ('https://www.denariusexplorer.org/',
                         {'tx': 'tx/', 'addr': 'address/'}),
-    'blockchainbdgpzk.onion': ('https://blockchainbdgpzk.onion/',
+    'Chainz.Cryptoid.info': ('https://chainz.cryptoid.info/dnr/',
+                        {'tx': 'tx.dws?', 'addr': 'address.dws?'}),
+    'Denarius.name': ('https://denarius.name/',
                         {'tx': 'tx/', 'addr': 'address/'}),
-    'Blockr.io': ('https://btc.blockr.io/',
-                        {'tx': 'tx/info/', 'addr': 'address/info/'}),
-    'Blocktrail.com': ('https://www.blocktrail.com/BTC/',
-                        {'tx': 'tx/', 'addr': 'address/'}),
-    'BTC.com': ('https://chain.btc.com/',
-                        {'tx': 'tx/', 'addr': 'address/'}),
-    'Chain.so': ('https://www.chain.so/',
-                        {'tx': 'tx/BTC/', 'addr': 'address/BTC/'}),
-    'Insight.is': ('https://insight.bitpay.com/',
-                        {'tx': 'tx/', 'addr': 'address/'}),
-    'TradeBlock.com': ('https://tradeblock.com/blockchain/',
-                        {'tx': 'tx/', 'addr': 'address/'}),
-    'BlockCypher.com': ('https://live.blockcypher.com/btc/',
-                        {'tx': 'tx/', 'addr': 'address/'}),
-    'Blockchair.com': ('https://blockchair.com/bitcoin/',
-                        {'tx': 'transaction/', 'addr': 'address/'}),
-    'blockonomics.co': ('https://www.blockonomics.co/',
-                        {'tx': 'api/tx?txid=', 'addr': '#/search?q='}),
     'system default': ('blockchain:/',
                         {'tx': 'tx/', 'addr': 'address/'}),
 }
 
 testnet_block_explorers = {
-    'Blocktrail.com': ('https://www.blocktrail.com/tBTC/',
+    'dnr.jpx.io': ('https://dnr.jpx.io',
                        {'tx': 'tx/', 'addr': 'address/'}),
     'system default': ('blockchain://000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943/',
                        {'tx': 'tx/', 'addr': 'address/'}),
@@ -554,17 +534,17 @@ def block_explorer_URL(config, kind, item):
 #urldecode = lambda x: _ud.sub(lambda m: chr(int(m.group(1), 16)), x)
 
 def parse_URI(uri, on_pr=None):
-    from . import bitcoin
-    from .bitcoin import COIN
+    from . import denarius
+    from .denarius import COIN
 
     if ':' not in uri:
-        if not bitcoin.is_address(uri):
-            raise BaseException("Not a bitcoin address")
+        if not denarius.is_address(uri):
+            raise BaseException("Not a denarius address")
         return {'address': uri}
 
     u = urllib.parse.urlparse(uri)
-    if u.scheme != 'bitcoin':
-        raise BaseException("Not a bitcoin URI")
+    if u.scheme != 'denarius':
+        raise BaseException("Not a denarius URI")
     address = u.path
 
     # python for android fails to parse query
@@ -580,8 +560,8 @@ def parse_URI(uri, on_pr=None):
 
     out = {k: v[0] for k, v in pq.items()}
     if address:
-        if not bitcoin.is_address(address):
-            raise BaseException("Invalid bitcoin address:" + address)
+        if not denarius.is_address(address):
+            raise BaseException("Invalid denarius address:" + address)
         out['address'] = address
     if 'amount' in out:
         am = out['amount']
@@ -600,7 +580,7 @@ def parse_URI(uri, on_pr=None):
     if 'exp' in out:
         out['exp'] = int(out['exp'])
     if 'sig' in out:
-        out['sig'] = bh2u(bitcoin.base_decode(out['sig'], None, base=58))
+        out['sig'] = bh2u(denarius.base_decode(out['sig'], None, base=58))
 
     r = out.get('r')
     sig = out.get('sig')
@@ -623,15 +603,15 @@ def parse_URI(uri, on_pr=None):
 
 
 def create_URI(addr, amount, message):
-    from . import bitcoin
-    if not bitcoin.is_address(addr):
+    from . import denarius
+    if not denarius.is_address(addr):
         return ""
     query = []
     if amount:
         query.append('amount=%s'%format_satoshis_plain(amount))
     if message:
         query.append('message=%s'%urllib.parse.quote(message))
-    p = urllib.parse.ParseResult(scheme='bitcoin', netloc='', path=addr, params='', query='&'.join(query), fragment='')
+    p = urllib.parse.ParseResult(scheme='denarius', netloc='', path=addr, params='', query='&'.join(query), fragment='')
     return urllib.parse.urlunparse(p)
 
 

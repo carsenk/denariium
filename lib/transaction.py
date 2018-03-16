@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Electrum - lightweight Bitcoin client
+# Denariium - lightweight Denarius client
 # Copyright (C) 2011 Thomas Voegtlin
 #
 # Permission is hereby granted, free of charge, to any person
@@ -29,14 +29,14 @@
 
 from .util import print_error, profiler
 
-from . import bitcoin
-from .bitcoin import *
+from . import denarius
+from .denarius import *
 import struct
 import traceback
 import sys
 
 #
-# Workalike python implementation of Bitcoin's CDataStream class.
+# Workalike python implementation of Denarius's CDataStream class.
 #
 from .keystore import xpubkey_to_address, xpubkey_to_pubkey
 
@@ -75,7 +75,7 @@ class BCDataStream(object):
         # 0 to 252 :  1-byte-length followed by bytes (if any)
         # 253 to 65,535 : byte'253' 2-byte-length followed by bytes
         # 65,536 to 4,294,967,295 : byte '254' 4-byte-length followed by bytes
-        # ... and the Bitcoin client is coded to understand:
+        # ... and the Denarius client is coded to understand:
         # greater than 4,294,967,295 : byte '255' 8-byte-length followed by bytes of string
         # ... but I don't think it actually handles any strings that big.
         if self.input is None:
@@ -200,11 +200,11 @@ class Enumeration:
         return self.reverseLookup[value]
 
 
-# This function comes from bitcointools, bct-LICENSE.txt.
+# This function comes from denariustools, bct-LICENSE.txt.
 def long_hex(bytes):
     return bytes.encode('hex_codec')
 
-# This function comes from bitcointools, bct-LICENSE.txt.
+# This function comes from denariustools, bct-LICENSE.txt.
 def short_hex(bytes):
     t = bytes.encode('hex_codec')
     if len(t) < 11:
@@ -315,7 +315,7 @@ def parse_scriptSig(d, _bytes):
         if item[0] == 0:
             # segwit embedded into p2sh
             # witness version 0
-            d['address'] = bitcoin.hash160_to_p2sh(bitcoin.hash_160(item))
+            d['address'] = denarius.hash160_to_p2sh(denarius.hash_160(item))
             if len(item) == 22:
                 d['type'] = 'p2wpkh-p2sh'
             elif len(item) == 34:
@@ -411,7 +411,7 @@ def get_address_from_output_script(_bytes):
     if match_decoded(decoded, match):
         return TYPE_PUBKEY, bh2u(decoded[0][1])
 
-    # Pay-by-Bitcoin-address TxOuts look like:
+    # Pay-by-Denarius-address TxOuts look like:
     # DUP HASH160 20 BYTES:... EQUALVERIFY CHECKSIG
     match = [ opcodes.OP_DUP, opcodes.OP_HASH160, opcodes.OP_PUSHDATA4, opcodes.OP_EQUALVERIFY, opcodes.OP_CHECKSIG ]
     if match_decoded(decoded, match):
@@ -499,7 +499,7 @@ def parse_witness(vds, txin):
             txin['witnessScript'] = witnessScript
             if not txin.get('scriptSig'):  # native segwit script
                 txin['type'] = 'p2wsh'
-                txin['address'] = bitcoin.script_to_p2wsh(txin['witnessScript'])
+                txin['address'] = denarius.script_to_p2wsh(txin['witnessScript'])
         elif txin['type'] == 'p2wpkh-p2sh' or n == 2:
             txin['num_sig'] = 1
             txin['x_pubkeys'] = [w[1]]
@@ -507,7 +507,7 @@ def parse_witness(vds, txin):
             txin['signatures'] = parse_sig([w[0]])
             if not txin.get('scriptSig'):  # native segwit script
                 txin['type'] = 'p2wpkh'
-                txin['address'] = bitcoin.public_key_to_p2wpkh(bfh(txin['pubkeys'][0]))
+                txin['address'] = denarius.public_key_to_p2wpkh(bfh(txin['pubkeys'][0]))
         else:
             raise UnknownTxinType()
     except UnknownTxinType:
@@ -673,9 +673,9 @@ class Transaction:
         if output_type == TYPE_SCRIPT:
             return addr
         elif output_type == TYPE_ADDRESS:
-            return bitcoin.address_to_script(addr)
+            return denarius.address_to_script(addr)
         elif output_type == TYPE_PUBKEY:
-            return bitcoin.public_key_to_p2pk_script(addr)
+            return denarius.public_key_to_p2pk_script(addr)
         else:
             raise TypeError('Unknown output type')
 
@@ -688,7 +688,7 @@ class Transaction:
                 return 0x41
             elif x_pubkey[0:2] == 'ff':  # bip32 extended pubkey
                 return 0x21
-            elif x_pubkey[0:2] == 'fe':  # old electrum extended pubkey
+            elif x_pubkey[0:2] == 'fe':  # old denariium extended pubkey
                 return 0x41
         except Exception as e:
             pass
@@ -783,11 +783,11 @@ class Transaction:
             return ''
         elif _type == 'p2wpkh-p2sh':
             pubkey = safe_parse_pubkey(pubkeys[0])
-            scriptSig = bitcoin.p2wpkh_nested_script(pubkey)
+            scriptSig = denarius.p2wpkh_nested_script(pubkey)
             return push_script(scriptSig)
         elif _type == 'p2wsh-p2sh':
             witness_script = self.get_preimage_script(txin)
-            scriptSig = bitcoin.p2wsh_nested_script(witness_script)
+            scriptSig = denarius.p2wsh_nested_script(witness_script)
             return push_script(scriptSig)
         elif _type == 'address':
             script += push_script(pubkeys[0])
@@ -808,17 +808,17 @@ class Transaction:
     def get_preimage_script(self, txin):
         # only for non-segwit
         if txin['type'] == 'p2pkh':
-            return bitcoin.address_to_script(txin['address'])
+            return denarius.address_to_script(txin['address'])
         elif txin['type'] in ['p2sh', 'p2wsh', 'p2wsh-p2sh']:
             pubkeys, x_pubkeys = self.get_sorted_pubkeys(txin)
             return multisig_script(pubkeys, txin['num_sig'])
         elif txin['type'] in ['p2wpkh', 'p2wpkh-p2sh']:
             pubkey = txin['pubkeys'][0]
-            pkh = bh2u(bitcoin.hash_160(bfh(pubkey)))
+            pkh = bh2u(denarius.hash_160(bfh(pubkey)))
             return '76a9' + push_script(pkh) + '88ac'
         elif txin['type'] == 'p2pk':
             pubkey = txin['pubkeys'][0]
-            return bitcoin.public_key_to_p2pk_script(pubkey)
+            return denarius.public_key_to_p2pk_script(pubkey)
         else:
             raise TypeError('Unknown txin type', txin['type'])
 
@@ -967,7 +967,7 @@ class Transaction:
     @classmethod
     def estimated_output_size(cls, address):
         """Return an estimate of serialized output size in bytes."""
-        script = bitcoin.address_to_script(address)
+        script = denarius.address_to_script(address)
         # 8 byte value + 1 byte script len + script
         return 9 + len(script) // 2
 
@@ -1031,7 +1031,7 @@ class Transaction:
                     pre_hash = Hash(bfh(self.serialize_preimage(i)))
                     pkey = regenerate_key(sec)
                     secexp = pkey.secret
-                    private_key = bitcoin.MySigningKey.from_secret_exponent(secexp, curve = SECP256k1)
+                    private_key = denarius.MySigningKey.from_secret_exponent(secexp, curve = SECP256k1)
                     public_key = private_key.get_verifying_key()
                     sig = private_key.sign_digest_deterministic(pre_hash, hashfunc=hashlib.sha256, sigencode = ecdsa.util.sigencode_der)
                     assert public_key.verify_digest(sig, pre_hash, sigdecode = ecdsa.util.sigdecode_der)
@@ -1049,7 +1049,7 @@ class Transaction:
             if type == TYPE_ADDRESS:
                 addr = x
             elif type == TYPE_PUBKEY:
-                addr = bitcoin.public_key_to_p2pkh(bfh(x))
+                addr = denarius.public_key_to_p2pkh(bfh(x))
             else:
                 addr = 'SCRIPT ' + x
             o.append((addr,v))      # consider using yield (addr, v)

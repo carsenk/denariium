@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Electrum - lightweight Bitcoin client
+# Denariium - lightweight Denarius client
 # Copyright (C) 2014 Thomas Voegtlin
 #
 # Permission is hereby granted, free of charge, to any person
@@ -25,7 +25,7 @@
 from threading import Lock
 import hashlib
 
-# from .bitcoin import Hash, hash_encode
+# from .denarius import Hash, hash_encode
 from .transaction import Transaction
 from .util import ThreadJob, bh2u
 
@@ -173,7 +173,7 @@ class Synchronizer(ThreadJob):
         we don't have.
         '''
         for history in self.wallet.history.values():
-            # Old electrum servers returned ['*'] when all history for
+            # Old denariium servers returned ['*'] when all history for
             # the address was pruned.  This no longer happens but may
             # remain in old wallets.
             if history == ['*']:

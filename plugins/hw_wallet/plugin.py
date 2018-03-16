@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 # -*- mode: python -*-
 #
-# Electrum - lightweight Bitcoin client
-# Copyright (C) 2016  The Electrum developers
+# Denariium - lightweight Denarius client
+# Copyright (C) 2016  The Denariium developers
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -24,8 +24,8 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from electrum.plugins import BasePlugin, hook
-from electrum.i18n import _
+from denariium.plugins import BasePlugin, hook
+from denariium.i18n import _
 
 
 class HW_PluginBase(BasePlugin):

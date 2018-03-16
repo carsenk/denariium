@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Electrum - lightweight Bitcoin client
+# Denariium - lightweight Denarius client
 # Copyright (C) 2012 thomasv@gitorious
 #
 # Permission is hereby granted, free of charge, to any person
@@ -31,14 +31,14 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from electrum.bitcoin import base_encode
-from electrum.i18n import _
-from electrum.plugins import run_hook
-from electrum import simple_config
+from denariium.denarius import base_encode
+from denariium.i18n import _
+from denariium.plugins import run_hook
+from denariium import simple_config
 
-from electrum.util import bfh
-from electrum.wallet import AddTransactionException
-from electrum.transaction import SerializationError
+from denariium.util import bfh
+from denariium.wallet import AddTransactionException
+from denariium.transaction import SerializationError
 
 from .util import *
 
@@ -50,7 +50,7 @@ def show_transaction(tx, parent, desc=None, prompt_if_unsaved=False):
         d = TxDialog(tx, parent, desc, prompt_if_unsaved)
     except SerializationError as e:
         traceback.print_exc(file=sys.stderr)
-        parent.show_critical(_("Electrum was unable to deserialize the transaction:") + "\n" + str(e))
+        parent.show_critical(_("Denariium was unable to deserialize the transaction:") + "\n" + str(e))
     else:
         dialogs.append(d)
         d.show()

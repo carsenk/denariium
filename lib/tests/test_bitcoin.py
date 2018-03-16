@@ -3,7 +3,7 @@ import unittest
 import sys
 from ecdsa.util import number_to_string
 
-from lib.bitcoin import (
+from lib.denarius import (
     generator_secp256k1, point_to_ser, public_key_to_p2pkh, EC_KEY,
     bip32_root, bip32_public_derivation, bip32_private_derivation, pw_encode,
     pw_decode, Hash, public_key_from_private_key, address_from_private_key,
@@ -21,7 +21,7 @@ except ImportError:
     sys.exit("Error: python-ecdsa does not seem to be installed. Try 'sudo pip install ecdsa'")
 
 
-class Test_bitcoin(unittest.TestCase):
+class Test_denarius(unittest.TestCase):
 
     def test_crypto(self):
         for message in [b"Chancellor on brink of second bailout for banks", b'\xff'*512]:
@@ -56,7 +56,7 @@ class Test_bitcoin(unittest.TestCase):
 
     def test_msg_signing(self):
         msg1 = b'Chancellor on brink of second bailout for banks'
-        msg2 = b'Electrum'
+        msg2 = b'Denariium'
 
         def sign_message_with_wif_privkey(wif_privkey, msg):
             txin_type, privkey, compressed = deserialize_privkey(wif_privkey)
@@ -164,7 +164,7 @@ class Test_bitcoin(unittest.TestCase):
         self.assertEqual(address_to_script('3PyjzJ3im7f7bcV724GR57edKDqoZvH7Ji'), 'a914f47c8954e421031ad04ecd8e7752c9479206b9d387')
 
 
-class Test_bitcoin_testnet(unittest.TestCase):
+class Test_denarius_testnet(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -194,7 +194,7 @@ class Test_bitcoin_testnet(unittest.TestCase):
 class Test_xprv_xpub(unittest.TestCase):
 
     xprv_xpub = (
-        # Taken from test vectors in https://en.bitcoin.it/wiki/BIP_0032_TestVectors
+        # Taken from test vectors in https://en.denarius.it/wiki/BIP_0032_TestVectors
         {'xprv': 'xprvA41z7zogVVwxVSgdKUHDy1SKmdb533PjDz7J6N6mV6uS3ze1ai8FHa8kmHScGpWmj4WggLyQjgPie1rFSruoUihUZREPSL39UNdE3BBDu76',
          'xpub': 'xpub6H1LXWLaKsWFhvm6RVpEL9P4KfRZSW7abD2ttkWP3SSQvnyA8FSVqNTEcYFgJS2UaFcxupHiYkro49S8yGasTvXEYBVPamhGW6cFJodrTHy',
          'xtype': 'standard'},
@@ -223,7 +223,7 @@ class Test_xprv_xpub(unittest.TestCase):
         return xpub, xprv
 
     def test_bip32(self):
-        # see https://en.bitcoin.it/wiki/BIP_0032_TestVectors
+        # see https://en.denarius.it/wiki/BIP_0032_TestVectors
         xpub, xprv = self._do_test_bip32("000102030405060708090a0b0c0d0e0f", "m/0'/1/2'/2/1000000000")
         self.assertEqual("xpub6H1LXWLaKsWFhvm6RVpEL9P4KfRZSW7abD2ttkWP3SSQvnyA8FSVqNTEcYFgJS2UaFcxupHiYkro49S8yGasTvXEYBVPamhGW6cFJodrTHy", xpub)
         self.assertEqual("xprvA41z7zogVVwxVSgdKUHDy1SKmdb533PjDz7J6N6mV6uS3ze1ai8FHa8kmHScGpWmj4WggLyQjgPie1rFSruoUihUZREPSL39UNdE3BBDu76", xprv)

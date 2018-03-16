@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- mode: python -*-
 #
-# Electrum - lightweight Bitcoin client
-# Copyright (C) 2016  The Electrum developers
+# Denariium - lightweight Denarius client
+# Copyright (C) 2016  The Denariium developers
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -27,11 +27,11 @@
 import threading
 
 from PyQt5.Qt import QVBoxLayout, QLabel
-from electrum_gui.qt.password_dialog import PasswordDialog, PW_PASSPHRASE
-from electrum_gui.qt.util import *
+from denariium_gui.qt.password_dialog import PasswordDialog, PW_PASSPHRASE
+from denariium_gui.qt.util import *
 
-from electrum.i18n import _
-from electrum.util import PrintError
+from denariium.i18n import _
+from denariium.util import PrintError
 
 # The trickiest thing about this handler was getting windows properly
 # parented on MacOSX.
@@ -172,9 +172,9 @@ class QtHandlerBase(QObject, PrintError):
 
 
 
-from electrum.plugins import hook
-from electrum.util import UserCancelled
-from electrum_gui.qt.main_window import StatusBarButton
+from denariium.plugins import hook
+from denariium.util import UserCancelled
+from denariium_gui.qt.main_window import StatusBarButton
 
 class QtPluginBase(object):
 

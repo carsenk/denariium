@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-# Electrum - lightweight Bitcoin client
-# Copyright (C) 2018 The Electrum developers
+# Denariium - lightweight Denarius client
+# Copyright (C) 2018 The Denariium developers
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -37,14 +37,14 @@ def read_json(filename, default):
     return r
 
 
-class BitcoinMainnet:
+class DenariusMainnet:
 
     TESTNET = False
-    WIF_PREFIX = 0x80
-    ADDRTYPE_P2PKH = 0
-    ADDRTYPE_P2SH = 5
+    WIF_PREFIX = 0x9E
+    ADDRTYPE_P2PKH = 30
+    ADDRTYPE_P2SH = 90
     SEGWIT_HRP = "bc"
-    GENESIS = "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f"
+    GENESIS = "00000d5dbbda01621cfc16bbc1f9bf3264d641a5dbf0de89fd0182c2c4828fcd"
     DEFAULT_PORTS = {'t': '50001', 's': '50002'}
     DEFAULT_SERVERS = read_json('servers.json', {})
     CHECKPOINTS = read_json('checkpoints.json', [])
@@ -65,14 +65,14 @@ class BitcoinMainnet:
     }
 
 
-class BitcoinTestnet:
+class DenariusTestnet:
 
     TESTNET = True
-    WIF_PREFIX = 0xef
-    ADDRTYPE_P2PKH = 111
-    ADDRTYPE_P2SH = 196
+    WIF_PREFIX = 0x92
+    ADDRTYPE_P2PKH = 18
+    ADDRTYPE_P2SH = 116
     SEGWIT_HRP = "tb"
-    GENESIS = "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943"
+    GENESIS = "000086bfe8264d241f7f8e5393f747784b8ca2aa98bdd066278d590462a4fdb4"
     DEFAULT_PORTS = {'t': '51001', 's': '51002'}
     DEFAULT_SERVERS = read_json('servers_testnet.json', {})
     CHECKPOINTS = read_json('checkpoints_testnet.json', [])
@@ -94,14 +94,14 @@ class BitcoinTestnet:
 
 
 # don't import net directly, import the module instead (so that net is singleton)
-net = BitcoinMainnet
+net = DenariusMainnet
 
 
 def set_mainnet():
     global net
-    net = BitcoinMainnet
+    net = DenariusMainnet
 
 
 def set_testnet():
     global net
-    net = BitcoinTestnet
+    net = DenariusTestnet

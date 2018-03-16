@@ -14,7 +14,7 @@ from kivy.core.window import Window
 from kivy.clock import Clock
 from kivy.utils import platform
 
-from electrum.base_wizard import BaseWizard
+from denariium.base_wizard import BaseWizard
 
 
 from . import EventsDialog
@@ -28,7 +28,7 @@ test_xpub = "xpub661MyMwAqRbcEbvVtRRSjqxVnaWVUMewVzMiURAKyYratih4TtBpMypzzefmv8z
 
 Builder.load_string('''
 #:import Window kivy.core.window.Window
-#:import _ electrum_gui.kivy.i18n._
+#:import _ denariium_gui.kivy.i18n._
 
 
 <WizardTextInput@TextInput>
@@ -73,7 +73,7 @@ Builder.load_string('''
             size: Window.size
 
     crcontent: crcontent
-    # add electrum icon
+    # add denariium icon
     BoxLayout:
         orientation: 'vertical' if self.width < self.height else 'horizontal'
         padding:
@@ -88,7 +88,7 @@ Builder.load_string('''
             height: self.minimum_height
             Label:
                 color: root.text_color
-                text: 'ELECTRUM'
+                text: 'DENARIIUM'
                 size_hint: 1, None
                 height: self.texture_size[1] if self.opacity else 0
                 font_size: '33sp'
@@ -559,8 +559,8 @@ class RestoreSeedDialog(WizardDialog):
     def __init__(self, wizard, **kwargs):
         super(RestoreSeedDialog, self).__init__(wizard, **kwargs)
         self._test = kwargs['test']
-        from electrum.mnemonic import Mnemonic
-        from electrum.old_mnemonic import words as old_wordlist
+        from denariium.mnemonic import Mnemonic
+        from denariium.old_mnemonic import words as old_wordlist
         self.words = set(Mnemonic('en').wordlist).union(set(old_wordlist))
         self.ids.text_input_seed.text = test_seed if is_test else ''
         self.message = _('Please type your seed phrase using the virtual keyboard.')

@@ -1,4 +1,4 @@
-# Electrum - Lightweight Bitcoin Client
+# Denariium - Lightweight Denarius Client
 # Copyright (c) 2011-2016 Thomas Voegtlin
 #
 # Permission is hereby granted, free of charge, to any person
@@ -35,12 +35,12 @@ import json
 
 import socks
 from . import util
-from . import bitcoin
-from .bitcoin import *
+from . import denarius
+from .denarius import *
 from . import constants
 from .interface import Connection, Interface
 from . import blockchain
-from .version import ELECTRUM_VERSION, PROTOCOL_VERSION
+from .version import DENARIIUM_VERSION, PROTOCOL_VERSION
 from .i18n import _
 
 
@@ -150,7 +150,7 @@ def serialize_server(host, port, protocol):
 
 
 class Network(util.DaemonThread):
-    """The Network class manages a set of connections to remote electrum
+    """The Network class manages a set of connections to remote denariium
     servers, each connected socket is handled by an Interface() object.
     Connections are initiated by a Connection() thread which stops once
     the connection succeeds or fails.
@@ -309,7 +309,7 @@ class Network(util.DaemonThread):
         requests = self.unanswered_requests.values()
         self.unanswered_requests = {}
         if self.interface.ping_required():
-            params = [ELECTRUM_VERSION, PROTOCOL_VERSION]
+            params = [DENARIIUM_VERSION, PROTOCOL_VERSION]
             self.queue_request('server.version', params, self.interface)
         for request in requests:
             message_id = self.queue_request(request[0], request[1])
@@ -625,7 +625,7 @@ class Network(util.DaemonThread):
             self.process_response(interface, response, callbacks)
 
     def addr_to_scripthash(self, addr):
-        h = bitcoin.address_to_scripthash(addr)
+        h = denarius.address_to_scripthash(addr)
         if h not in self.h2addr:
             self.h2addr[h] = addr
         return h
@@ -739,7 +739,7 @@ class Network(util.DaemonThread):
             if interface.has_timed_out():
                 self.connection_down(interface.server)
             elif interface.ping_required():
-                params = [ELECTRUM_VERSION, PROTOCOL_VERSION]
+                params = [DENARIIUM_VERSION, PROTOCOL_VERSION]
                 self.queue_request('server.version', params, interface)
 
         now = time.time()
