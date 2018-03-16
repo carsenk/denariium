@@ -144,7 +144,7 @@ class TcpConnection(threading.Thread, util.PrintError):
                     context = self.get_ssl_context(cert_reqs=ssl.CERT_REQUIRED, ca_certs=ca_path)
                     s = context.wrap_socket(s, do_handshake_on_connect=True)
                 except ssl.SSLError as e:
-                    print_error(e)
+                    self.print_error(e)
                     s = None
                 except:
                     return
@@ -174,6 +174,8 @@ class TcpConnection(threading.Thread, util.PrintError):
                 temporary_path = cert_path + '.temp'
                 with open(temporary_path,"w") as f:
                     f.write(cert)
+                    f.flush()
+                    os.fsync(f.fileno())
             else:
                 is_new = False
 
