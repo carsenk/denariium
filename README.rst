@@ -4,16 +4,16 @@ Denariium - Lightweight Denarius client
 ::
 
   Licence: MIT Licence
-  Author: Thomas Voegtlin
+  Author: Thomas Voegtlin, Carsen Klock (Denariium version)
   Language: Python
   Homepage: https://denariium.org/
 
 
-.. image:: https://travis-ci.org/spesmilo/denariium.svg?branch=master
-    :target: https://travis-ci.org/spesmilo/denariium
+.. image:: https://travis-ci.org/carsenk/denariium.svg?branch=master
+    :target: https://travis-ci.org/carsenk/denariium
     :alt: Build Status
-.. image:: https://coveralls.io/repos/github/spesmilo/denariium/badge.svg?branch=master
-    :target: https://coveralls.io/github/spesmilo/denariium?branch=master
+.. image:: https://coveralls.io/repos/github/carsenk/denariium/badge.svg?branch=master
+    :target: https://coveralls.io/github/carsenk/denariium?branch=master
     :alt: Test coverage statistics
 .. image:: https://img.shields.io/badge/help-translating-blue.svg
     :target: https://crowdin.com/project/denariium
@@ -57,7 +57,7 @@ Development version
 
 Check out the code from Github::
 
-    git clone git://github.com/spesmilo/denariium.git
+    git clone git://github.com/carsenk/denariium.git
     cd denariium
 
 Run install (this should install dependencies)::
