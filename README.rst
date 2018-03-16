@@ -4,9 +4,9 @@ Denariium - Lightweight Denarius client
 ::
 
   Licence: MIT Licence
-  Author: Thomas Voegtlin, Carsen Klock (Denariium version)
+  Author: Thomas Voegtlin (Electrum), Carsen Klock (Denariium version)
   Language: Python
-  Homepage: https://denariium.org/
+  Homepage: https://denariium.org/ https://electrum.org
 
 
 .. image:: https://travis-ci.org/carsenk/denariium.svg?branch=master
